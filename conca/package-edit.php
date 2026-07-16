@@ -146,7 +146,7 @@ $package = $statement->fetch(PDO::FETCH_ASSOC);
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            const form = document.getElementById("country_edit");
+            const form = document.getElementById("package_edit");
 
             form.addEventListener("submit", function (e) {
 
@@ -157,7 +157,7 @@ $package = $statement->fetch(PDO::FETCH_ASSOC);
 
                 const formData = new FormData(form);
 
-                fetch("./api/update/country.php", {
+                fetch("./api/update/package.php", {
                     method: "POST",
                     body: formData
                 })
@@ -169,7 +169,7 @@ $package = $statement->fetch(PDO::FETCH_ASSOC);
                         if (response.trim() === "success") {
 
                             Swal.fire({
-                                title: "Ölkə məlumatları uğurla yeniləndi.",
+                                title: "Paket məlumatları uğurla yeniləndi.",
                                 icon: "success",
                                 draggable: true
                             });
