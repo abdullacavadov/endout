@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>EndOut</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="assets/img/favicon.png">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="assets/plugins/select2/css/select2.min.css">
+
+    <!-- Aos CSS -->
+    <link rel="stylesheet" href="assets/plugins/aos/aos.css">
+
+    <!-- Datetimepicker CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap-datetimepicker.min.css">
+
+    <!-- Fearther CSS -->
+    <link rel="stylesheet" href="assets/css/feather.css">
+
+    <!-- Owl carousel CSS -->
+    <link rel="stylesheet" href="assets/css/owl.carousel.min.css">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .sticky-banner {
+            position: sticky;
+            top: 129px;
+            height: calc(100vh - 129px);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        @media (max-width: 1000px) {
+            .sticky-banner {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-wrapper home-nine">
+        <!-- Header -->
+        <header class="header header-nine">
+            <div class="header-top">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-8">
+							<ul class="d-flex justify-content-start car-top-left gap-3">
+								<li class="d-flex align-items-center"><a href="categories.html" style="border: none"><i
+											class="fa-solid fa-store"></i> Mağaza və xidmətlər</a>
+								</li>
+								<li class="d-flex align-items-center"><a href="signup.html" style="border: none"><i
+											class="fa-solid fa-business-time"></i> Partnyor ol</a></li>
+								<li class="d-flex align-items-center"><a href="favorites.html" style="border: none"><i
+											class="fa-solid fa-heart"></i> Favoritlər</a></li>
+
+							</ul>
+						</div>
+						<div class="col-md-4">
+							<div class="selection-list">
+								<div class="head-contact">
+									<a href="login.html"><span class="me-2"><i class="feather-user"></i></span>Daxil
+										ol</a>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+            <div class="container">
+                <nav class="navbar navbar-expand-lg header-nav">
+                    <div class="navbar-header">
+                        <a id="mobile_btn" href="javascript:void(0);">
+                            <span class="bar-icon">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </span>
+                        </a>
+                        <a href="index.html" class="navbar-brand logo">
+                            <img src="assets/img/logo.png" class="img-fluid" alt="Logo" style="height: 38px;">
+                        </a>
+                        <a href="index.html" class="navbar-brand logo-small">
+                            <img src="assets/img/logo.png" class="img-fluid" alt="Logo">
+                        </a>
+                    </div>
+                    <div class="main-menu-wrapper">
+                        <div class="menu-header">
+                            <a href="index.html" class="menu-logo">
+                                <img src="assets/img/logo.png" class="img-fluid" alt="Logo">
+                            </a>
+                            <a id="menu_close" class="menu-close" href="javascript:void(0);"> <i
+                                    class="fas fa-times"></i></a>
+                        </div>
+                        <ul class="navbar-nav main-nav my-2 my-lg-0">
+                            <li class="has-submenu megamenu active">
+                                <a href="index.html">Ana səhifə</a>
+
+                            </li>
+                            <li class="has-submenu">
+                                <a href="javascript:void(0);">Endirim <i class="fas fa-chevron-down"></i></a>
+                                <ul class="submenu">
+                                    <li class="has-submenu">
+                                        <a href="javascript:void(0);">Topdan satış</a>
+                                        <ul class="submenu">
+                                            <li><a href="blog-list.html">Blog List</a></li>
+                                            <li><a href="blog-grid.html">Blog Grid</a></li>
+                                            <li><a href="blog-details.html">Blog Details</a></li>
+                                            <li><a href="blog-list-sidebar.html">Blog List Sidebar</a></li>
+                                            <li><a href="blog-grid-sidebar.html">Blog Grid Sidebar</a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="has-submenu">
+                                        <a href="javascript:void(0);">Pərakəndə satış</a>
+                                        <ul class="submenu">
+                                            <li><a href="blog-list.html">Blog List</a></li>
+                                            <li><a href="blog-grid.html">Blog Grid</a></li>
+                                            <li><a href="blog-details.html">Blog Details</a></li>
+                                            <li><a href="blog-list-sidebar.html">Blog List Sidebar</a></li>
+                                            <li><a href="blog-grid-sidebar.html">Blog Grid Sidebar</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="has-submenu">
+                                <a href="javascript:void(0);">Satış <i class="fas fa-chevron-down"></i></a>
+                                <ul class="submenu">
+                                    <li class="has-submenu">
+                                        <a href="javascript:void(0);">Topdan satış</a>
+                                        <ul class="submenu">
+                                            <li><a href="blog-list.html">Blog List</a></li>
+                                            <li><a href="blog-grid.html">Blog Grid</a></li>
+                                            <li><a href="blog-details.html">Blog Details</a></li>
+                                            <li><a href="blog-list-sidebar.html">Blog List Sidebar</a></li>
+                                            <li><a href="blog-grid-sidebar.html">Blog Grid Sidebar</a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="has-submenu">
+                                        <a href="javascript:void(0);">Pərakəndə satış</a>
+                                        <ul class="submenu">
+                                            <li><a href="blog-list.html">Blog List</a></li>
+                                            <li><a href="blog-grid.html">Blog Grid</a></li>
+                                            <li><a href="blog-details.html">Blog Details</a></li>
+                                            <li><a href="blog-list-sidebar.html">Blog List Sidebar</a></li>
+                                            <li><a href="blog-grid-sidebar.html">Blog Grid Sidebar</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="has-submenu">
+                                <a href="javascript:void(0);">Outlet</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                    <div class="d-flex align-items-center block-e">
+                        <a href="categories.html" class="car-list-btn header-phone">
+                            <span><i class="feather-phone"></i></span>+994 50 123 45 67
+                        </a>
+                        <a href="categories.html" class="car-list-btn">
+                            <span><i class="feather-plus-circle"></i></span>Elan yerləşdir
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </header>
+        <!-- /Header -->
+
+        <div class="row">
+            <a class="col-lg-2 col-md-2 sticky-banner" href="https://google.com" target="_blank"
+                style="background-image:url(https://prodimages.everythingneon.com/l100-10487-custom-open-neon-sign_giant.gif);">
+            </a>
+
+            <div class="col-lg-8 col-md-12 col-xs-12">
+
+                <!-- Banner -->
+                <section class="banner-section banner-nine">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="banner-contents">
+                                    <h1 class="aos" data-aos="fade-up" data-aos-anchor-placement="top-bottom">Lorem
+                                        ipsum dolor sit.</h1>
+                                    <h6 class="mb-0 aos" data-aos="fade-up" data-aos-anchor-placement="top-bottom">Lorem
+                                        ipsum, dolor sit amet consectetur adipisicing elit. Officia!</h6>
+                                    <p class="aos" data-aos="fade-up" data-aos-delay="200">Lorem Ipsum is simply dummy
+                                        text of
+                                        the printing and typesetting industry. Lorem Ipsum has been the industry's
+                                        standard
+                                        dummy text ever since the 1500s,</p>
+                                    <div class="banner-nine-btn-group">
+                                        <a href="categories.html" class="aos" data-aos="fade-up" data-aos-delay="300">
+                                            <span>Reklam butonu</span>
+                                        </a>
+                                        <a href="categories.html" class="aos" data-aos="fade-up" data-aos-delay="300">
+                                            <span>Reklam butonu</span>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- /Banner -->
+
+                <!-- Search Filter Section -->
+                <style>
+                    .select2-container--default .select2-selection--single .select2-selection__rendered {
+                        font-size: 13px !important;
+                    }
+
+                    .select2-container--default .select2-results__option--highlighted[aria-selected],
+                    .select2-results__option[aria-selected],
+                    .select2-container--default .select2-results__option[aria-disabled=true],
+                    .car-search-filter .car-filter-section .form-control {
+                        font-size: 12px !important;
+                    }
+
+                    .select2-container .select2-selection--single {
+                        height: 41px !important;
+                    }
+                </style>
+                <section class="car-search-filter realestate-search-filter  aos" data-aos="fade-up"
+                    data-aos-delay="400">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="car-filter-section">
+                                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="pills-discount-tab"
+                                                data-bs-toggle="pill" data-bs-target="#pills-discount" type="button"
+                                                role="tab" aria-controls="pills-discount"
+                                                aria-selected="true">Endirim</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="pills-outlet-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-outlet" type="button" role="tab"
+                                                aria-controls="pills-outlet" aria-selected="false">Outlet</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="pills-discount-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-discount" type="button" role="tab"
+                                                aria-controls="pills-discount" aria-selected="false">Satış</button>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content" id="pills-tabContent">
+                                        <div class="tab-pane fade show active" id="pills-discount" role="tabpanel"
+                                            aria-labelledby="pills-discount-tab" tabindex="0">
+                                            <div class="search-tab-col">
+                                                <form
+                                                    action="https://listee.dreamstechnologies.com/html/listing-grid-sidebar.html">
+                                                    <div class="row align-items-center search-form">
+                                                        <div class="col-12 col-lg-10 datepicker-col search-group">
+                                                            <div class="row">
+                                                                <div class="col-lg-6 mt-1">
+                                                                    <div class="d-flex real-estate-search">
+                                                                        <div
+                                                                            class="flex-shrink-0 d-flex align-items-center">
+                                                                            <div class="icon-blk rounded-circle">
+                                                                                <span><i
+                                                                                        class="feather-hash"></i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 estate-input">
+                                                                            <input type="text" name="name"
+                                                                                class="border-0 text-truncate px-0 form-control"
+                                                                                placeholder="Açar söz...">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-6 mt-1">
+                                                                    <div class="d-flex real-estate-search real-select">
+                                                                        <div
+                                                                            class="flex-shrink-0 d-flex align-items-center">
+                                                                            <div class="icon-blk rounded-circle">
+                                                                                <span><i
+                                                                                        class="feather-layers"></i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 estate-input">
+                                                                            <select
+                                                                                style="font-size: 12px !important; height: 25px;"
+                                                                                class="form-control select">
+                                                                                <option selected disabled>Kateqoriya seç
+                                                                                </option>
+                                                                                <option>Topdan</option>
+                                                                                <option>Pərakəndə</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-lg-6 mt-1">
+                                                                    <div class="d-flex real-estate-search real-select">
+                                                                        <div
+                                                                            class="flex-shrink-0 d-flex align-items-center">
+                                                                            <div class="icon-blk rounded-circle">
+                                                                                <span><i
+                                                                                        class="feather-globe"></i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 estate-input">
+                                                                            <select class="form-control select">
+                                                                                <option disabled>-- Ölkə seç --</option>
+                                                                                <option selected>Azərbaycan</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-lg-6 mt-1">
+                                                                    <div class="row">
+                                                                        <div class="col-6">
+                                                                            <div class="d-flex real-estate-search">
+                                                                                <div
+                                                                                    class="flex-shrink-0 d-flex align-items-center">
+                                                                                    <div
+                                                                                        class="icon-blk rounded-circle">
+                                                                                        <span><i
+                                                                                                class="feather-dollar-sign"></i></span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="flex-grow-1 estate-input">
+                                                                                    <input type="text" name="name"
+                                                                                        class="border-0 text-truncate px-0 form-control"
+                                                                                        placeholder="Min. qiymət...">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="col-6">
+                                                                            <div class="d-flex real-estate-search">
+                                                                                <div
+                                                                                    class="flex-shrink-0 d-flex align-items-center">
+                                                                                    <div
+                                                                                        class="icon-blk rounded-circle">
+                                                                                        <span><i
+                                                                                                class="feather-dollar-sign"></i></span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="flex-grow-1 estate-input">
+                                                                                    <input type="text" name="name"
+                                                                                        class="border-0 text-truncate px-0 form-control"
+                                                                                        placeholder="Max. qiymət...">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-lg-2 real-search-bar">
+                                                            <button class="btn car-search-icon" type="submit">Tətbiq
+                                                                et</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade show" id="pills-outlet" role="tabpanel"
+                                            aria-labelledby="pills-outlet-tab" tabindex="0">
+                                            <div class="search-tab-col">
+                                                <form
+                                                    action="https://listee.dreamstechnologies.com/html/listing-grid-sidebar.html">
+                                                    <div class="row align-items-center search-form">
+                                                        <div class="col-12 col-lg-10 datepicker-col search-group">
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <div class="d-flex real-estate-search">
+                                                                        <div
+                                                                            class="flex-shrink-0 d-flex align-items-center">
+                                                                            <div class="icon-blk rounded-circle">
+                                                                                <span><i
+                                                                                        class="feather-hash"></i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 estate-input">
+                                                                            <input type="text" name="name"
+                                                                                class="border-0 text-truncate px-0 form-control"
+                                                                                placeholder="Açar söz...">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-3">
+
+                                                                </div>
+
+                                                                <div class="col-lg-3">
+                                                                    <div class="d-flex real-estate-search real-select">
+                                                                        <div
+                                                                            class="flex-shrink-0 d-flex align-items-center">
+                                                                            <div class="icon-blk rounded-circle">
+                                                                                <span><i
+                                                                                        class="feather-globe"></i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 estate-input">
+                                                                            <select class="form-control select">
+                                                                                <option disabled>-- Ölkə seç --</option>
+                                                                                <option selected>Azərbaycan</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-lg-2 real-search-bar">
+                                                            <button class="btn car-search-icon" type="submit">Tətbiq
+                                                                et</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade show" id="pills-discount" role="tabpanel"
+                                            aria-labelledby="pills-discount-tab" tabindex="0">
+                                            <div class="search-tab-col">
+                                                <form
+                                                    action="https://listee.dreamstechnologies.com/html/listing-grid-sidebar.html">
+                                                    <div class="row align-items-center search-form">
+                                                        <div class="col-12 col-lg-10 datepicker-col search-group">
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <div class="d-flex real-estate-search">
+                                                                        <div
+                                                                            class="flex-shrink-0 d-flex align-items-center">
+                                                                            <div class="icon-blk rounded-circle">
+                                                                                <span><i
+                                                                                        class="feather-hash"></i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 estate-input">
+                                                                            <input type="text" name="name"
+                                                                                class="border-0 text-truncate px-0 form-control"
+                                                                                placeholder="Açar söz...">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-3">
+                                                                    <div class="d-flex real-estate-search real-select">
+                                                                        <div
+                                                                            class="flex-shrink-0 d-flex align-items-center">
+                                                                            <div class="icon-blk rounded-circle">
+                                                                                <span><i
+                                                                                        class="feather-layers"></i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 estate-input">
+                                                                            <select
+                                                                                style="font-size: 12px !important; height: 25px;"
+                                                                                class="form-control select">
+                                                                                <option selected disabled>Kateqoriya seç
+                                                                                </option>
+                                                                                <option>Topdan</option>
+                                                                                <option>Pərakəndə</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-lg-3">
+                                                                    <div class="d-flex real-estate-search real-select">
+                                                                        <div
+                                                                            class="flex-shrink-0 d-flex align-items-center">
+                                                                            <div class="icon-blk rounded-circle">
+                                                                                <span><i
+                                                                                        class="feather-globe"></i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 estate-input">
+                                                                            <select class="form-control select">
+                                                                                <option disabled>-- Ölkə seç --</option>
+                                                                                <option selected>Azərbaycan</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-lg-2 real-search-bar">
+                                                            <button class="btn car-search-icon" type="submit">Tətbiq
+                                                                et</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- /Search Filter Section -->
+
+                <!-- Premium Banner -->
+                <section class="section-blk recommended-blk style1-blk">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="title-blk justify-content-center text-center" style="margin: 0 !important;">
+                                    <h2>Premium elanlar</h2>
+                                </div>
+
+                                <div class="card-body tab-content">
+                                    <div class="tab-pane active" id="hotels">
+                                        <div class="recommended-carousel"
+                                            style="border: 2px solid #c10037; padding: 10px; border-radius: 40px;">
+                                            <div class="recommended-slider owl-carousel owl-theme">
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-1.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">America – Grand canyon, Golden
+                                                                Gate</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$42</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,312 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-2.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk top-rated-style">
+                                                            <p>Satış</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Argentina – Great Diving
+                                                                Trip</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$62</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,312 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-3.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Brazil – Rio de Janeiro</a>
+                                                        </p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$32</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(1,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-4.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk bf-style">
+                                                            <p>Outlet</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">India – Mumbai, New Delhi</a>
+                                                        </p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$82</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-1.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Lorem Ipsum is simply dummy
+                                                                text of the printing</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(3,012 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="restaurants">
+                                        <div class="recommended-carousel">
+                                            <div class="recommended-slider owl-carousel owl-theme">
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-1.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">America – Grand canyon, Golden
+                                                                Gate</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$34</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,355 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-2.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk top-rated-style">
+                                                            <p>Satış</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Argentina – Great Diving
+                                                                Trip</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$52</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-3.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Brazil – Rio de Janeiro</a>
+                                                        </p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-4.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk bf-style">
+                                                            <p>Outlet</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">India – Mumbai, New Delhi</a>
+                                                        </p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-1.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Lorem Ipsum is simply dummy
+                                                                text of the printing</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="shops">
+                                        <div class="recommended-carousel">
+                                            <div class="recommended-slider owl-carousel owl-theme">
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-1.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">America – Grand canyon, Golden
+                                                                Gate</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-2.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk top-rated-style">
+                                                            <p>Satış</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Argentina – Great Diving
+                                                                Trip</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-3.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Brazil – Rio de Janeiro</a>
+                                                        </p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$45</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-4.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk bf-style">
+                                                            <p><a href="service-details.html">Outlet</a>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p>India – Mumbai, New Delhi</p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-1.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Lorem Ipsum is simply dummy
+                                                                text of the printing</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="business">
+                                        <div class="recommended-carousel">
+                                            <div class="recommended-slider owl-carousel owl-theme">
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-1.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">America – Grand canyon, Golden
+                                                                Gate</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$67</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-2.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk top-rated-style">
+                                                            <p>Satış</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Argentina – Great Diving
+                                                                Trip</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-3.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Brazil – Rio de Janeiro</a>
+                                                        </p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-4.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk bf-style">
+                                                            <p>Outlet</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">India – Mumbai, New Delhi</a>
+                                                        </p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-1.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Lorem Ipsum is simply dummy
+                                                                text of the printing</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="lifestyle">
+                                        <div class="recommended-carousel">
+                                            <div class="recommended-slider owl-carousel owl-theme">
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-1.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">America – Grand canyon, Golden
+                                                                Gate</a></p>
+                                                        <div class="loc-blk">
+                                                            <span class="material-symbols-outlined">
+                                                                location_on
+                                                            </span>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-2.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk top-rated-style">
+                                                            <p>Satış</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Argentina – Great Diving
+                                                                Trip</a></p>
+                                                        <div class="loc-blk">
+                                                            <span class="material-symbols-outlined">
+                                                                location_on
+                                                            </span>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$72</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-3.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Brazil – Rio de Janeiro</a>
+                                                        </p>
+                                                        <div class="loc-blk">
+                                                            <span class="material-symbols-outlined">
+                                                                location_on
+                                                            </span>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$39</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-4.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk bf-style">
+                                                            <p>Outlet</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">India – Mumbai, New Delhi</a>
+                                                        </p>
+                                                        <div class="loc-blk">
+                                                            <span class="material-symbols-outlined">
+                                                                location_on
+                                                            </span>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$56</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="recommended-widget">
+                                                    <div class="img-blk">
+                                                        <a href="service-details.html"><img
+                                                                src="assets/img/recommended/gallery-2.jpg"
+                                                                class="img-fluid" alt="List 1"></a>
+                                                        <div class="top-blk">
+                                                            <p>Endirim</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content-blk">
+                                                        <p><a href="service-details.html">Lorem Ipsum is simply dummy
+                                                                text of the printing</a></p>
+                                                        <div class="loc-blk">
+                                                            <i class="feather-map-pin"></i>
+                                                            <p>Westminster , London</p>
+                                                        </div>
+                                                        <div class="detail-blk">
+                                                            <p>Starting from <span>US$34</span></p>
+                                                            <div class="detail-btm-blk">
+                                                                <div class="rating-badge">
+                                                                    <span><i class="fa-solid fa-star"></i></span>
+                                                                    4.9
+                                                                </div>
+                                                                <small>(2,612 Reviews)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- /Premium Banner -->
+
+                <!-- Elanlar -->
+                <section class="featured-listing-section ">
+                    <div class="footer-six-bg footer-nine-bg">
+                        <img src="assets/img/bg/feature-bg.png" alt="">
+                    </div>
+                    <div class="container">
+
+                        <style>
+                            .add-fav:hover {
+                                font-weight: 900;
+                                cursor: pointer;
+                                transform: scale(1.2);
+                                /* solid üçün */
+                            }
+                        </style>
+
+                        <div class="row aos" data-aos="fade-up" data-aos-delay="200">
+
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound,
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-rent col-lg-3 col-md-4 col-sm-6">
+                                <div class="feature-home-img">
+                                    <a href="listingmap-list.html"><img src="assets/img/featured/property-feature-1.jpg"
+                                            class="img-fluid" alt=""></a>
+                                </div>
+
+                                <div class="select-favourite-room">
+                                    <div class="favourite-small-user">
+                                        <img src="assets/img/profiles/avatar-01.jpg" class="img-fluid" alt="">
+                                    </div>
+
+                                    <i class="add-fav fa-regular fa-heart"></i>
+                                </div>
+
+
+                                <div class="home-img-text">
+
+                                    <h6 style="margin-top: 5px">300 azn</h6>
+
+                                    <h3 style="margin-top: -5px;">
+                                        <a href="listingmap-list.html">
+                                            MS
+                                            Northbound, Peachfie vds ffsds ld Road,
+                                            Uk
+                                        </a>
+                                    </h3>
+
+                                    <div class="top-room-details">
+                                        <div>
+                                            <span style="font-size: 10px;">Əsas / Orta / Alt</span>
+                                        </div>
+                                    </div>
+                                    <div class="house-type">
+                                        <span class="room-type">AZ, Bakı, Bu gün, 12:15</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+                <!-- /Elanlar -->
+
+
+
+
+
+
+                <!-- Footer -->
+                <section class="footer-six footer-nine">
+                    <div class="footer-six-bg footer-nine-bg">
+                        <img src="assets/img/bg/footer-bg.png" alt="">
+                    </div>
+                    <div class="container">
+                        <div class="footer-six-top footer-nine-top">
+                            <div class="row align-items-center">
+                                <div class="col-lg-6 col-md-12">
+                                    <div class="footer-six-right">
+                                        <div class="footer-send-mail">
+                                            <input type="text" class="form-control"
+                                                placeholder="Yeniliklər üçün e-poçt ünvanınızı daxil edin">
+                                            <a href="javascript:void(0);">Abunə ol</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12">
+                                    <div class="footer-six-center foot-nine-list">
+                                        <div class="footer-six-center-content">
+                                            <h6>Ümumi ziyarətçi</h6>
+                                            <a href="javascript:void(0);">4.565.697</a>
+                                        </div>
+                                        <div class="footer-six-center-content">
+                                            <h6>Ümumi elan sayı</h6>
+                                            <a href="javascript:void(0);">5.156.597</a>
+                                        </div>
+                                        <div class="footer-six-center-content">
+                                            <h6>Toll Free Customer Care</h6>
+                                            <a href="javascript:void(0);">+91 26447 99875</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" row position-relative">
+                            <div class="col-lg-4 col-md-6  col-sm-12">
+                                <div class="foot-nine-logo">
+                                    <a href="index-9.html"><img src="assets/img/logo.png" height="50" alt=""></a>
+                                    <p>
+                                        EndOut ilə ən yaxşı təklifləri kəşf et, fürsətləri dəyərləndir və həyatını daha
+                                        sərfəli et.
+                                        <hr>
+                                        <strong class="text-light">Mükəmməl həyat fürsətlərlə başlayır.</strong>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="social-icon-six social-icon-nine">
+                                    <h3>EndOut sosial mediada</h3>
+                                    <ul>
+                                        <li>
+                                            <a href="javascript:void(0);" target="_blank"><i
+                                                    class="fab fa-facebook-f"></i> </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);" target="_blank"><i class="fab fa-twitter"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);" target="_blank"><i
+                                                    class="fab fa-instagram"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);" target="_blank"><i
+                                                    class="fab fa-linkedin-in"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="custom-line foot-nine-line">
+                        <div class="footer-six-bottom pt-0">
+                            <p class="mb-0">© 2026 EndOut. Bütün hüquqlar qorunur.</p>
+                            <div class="footer-six-center-list">
+                                <ul>
+                                    <li><a href="index-6.html"> Ana səhifə</a></li>
+                                    <li><a href="javascript:void(0);"> Sayt xəritəsi</a></li>
+                                    <li><a href="privacy-policy.html"> İstifadə şərtləri</a></li>
+                                    <li><a href="privacy-policy.html"> Məxfilik siyasəti</a></li>
+                                    <li><a href="privacy-policy.html"> Cookie siyasəti</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- /Footer -->
+
+            </div>
+
+            <a class="col-lg-2 col-md-8 sticky-banner" href="https://google.com" target="_blank"
+                style="background-image:url(https://prodimages.everythingneon.com/l100-10487-custom-open-neon-sign_giant.gif)">
+            </a>
+        </div>
+
+
+    </div>
+
+    <!-- scrollToTop start -->
+    <div class="home-nine progress-wrap active-progress">
+        <svg class="progress-circle svg-content" width="99px" height="99px" viewBox="0 0 200 200">
+            <path d="  M 0, 35.5 C 0, 0 0, 0 35.5, 0 S 71, 0 71, 35.5 71, 71 35.5, 71 0, 71 0, 35.5"
+                style="transition: stroke-dashoffset 10ms linear 0s; stroke-dasharray: 307.919px, 307.919px; stroke-dashoffset: 228.265px;">
+            </path>
+        </svg>
+    </div>
+    <!-- scrollToTop end -->
+
+
+    <!-- jQuery -->
+    <script data-cfasync="false" src="assets/plugins/email-decode.min.js.2"></script>
+    <script src="assets/js/jquery-3.7.1.min.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <!-- Bootstrap Core JS -->
+    <script src="assets/js/bootstrap.bundle.min.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <!-- Datetimepicker JS -->
+    <script src="assets/js/moment.min.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+    <script src="assets/js/bootstrap-datetimepicker.min.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <!-- Select2 JS -->
+    <script src="assets/plugins/select2/js/select2.min.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <!-- Aos -->
+    <script src="assets/plugins/aos/aos.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <!-- Top JS -->
+    <script src="assets/js/backToTop.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <!-- counterup JS -->
+    <script src="assets/js/jquery.waypoints.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+    <script src="assets/js/jquery.counterup.min.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <!-- Fearther JS -->
+    <script src="assets/js/feather.min.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <!-- Owl Carousel JS -->
+    <script src="assets/js/owl.carousel.min.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <!-- Custom JS -->
+    <script src="assets/js/script.js" type="fca7c691a9a41484a930bc86-text/javascript"></script>
+
+    <script src="assets/plugins/rocket-loader.min.js" data-cf-settings="fca7c691a9a41484a930bc86-|49" defer></script>
+</body>
+
+</html>

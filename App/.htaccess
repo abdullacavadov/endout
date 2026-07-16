@@ -1,0 +1,29 @@
+RewriteEngine On
+RewriteBase /endout/App/
+
+# API toxunma
+RewriteRule ^api/ - [L]
+
+# Mövcud fayl/qovluq varsa toxunma
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Listings
+RewriteRule ^listings/(.*)$ listings.php?path=$1 [L,QSA]
+
+# Listing detail
+RewriteRule ^listing/([^/]+)/([0-9]+)$ listing.php?slug=$1&id=$2 [L,QSA]
+
+# Tender detail
+RewriteRule ^tender/([^/]+)/([0-9]+)$ tender.php?slug=$1&id=$2 [L,QSA]
+
+# Market
+RewriteRule ^market/([^/]+)/([0-9]+)$ market.php?slug=$1&id=$2 [L,QSA]
+
+# Yalnız mövcud PHP fayllar
+RewriteCond %{DOCUMENT_ROOT}/endout/App/$1.php -f
+RewriteRule ^([^/]+)$ $1.php [L]
+
+# 404
+ErrorDocument 404 /endout/App/404.php

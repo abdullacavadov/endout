@@ -1,0 +1,203 @@
+	<!-- <div class="col-lg-3 theiaStickySidebar">
+								<div class="listings-sidebar">
+									<div class="card">
+										<h4><img src="assets/img/details-icon.svg" alt="details-icon"> Filter</h4>
+										<form method="GET">
+											<div class="filter-content looking-input form-set">
+												<input type="text" name="q" class="form-control"
+													placeholder="Açar söz ..."
+													value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
+											</div>
+											<div class="filter-content form-set amenities">
+												<h4> Kateqoriya</h4>
+												<ul>
+													<?php
+													function getIntg($key)
+													{
+														return isset($_GET[$key]) && $_GET[$key] !== '' ? (int) $_GET[$key] : null;
+													}
+
+													function getArray($key)
+													{
+														if (!isset($_GET[$key]))
+															return [];
+
+														$val = $_GET[$key];
+
+														if (is_array($val)) {
+															return array_map('intval', $val);
+														}
+
+														// fallback: ?main=3 kimi köhnə URL-lər üçün
+														return [(int) $val];
+													}
+
+													function getStr($key)
+													{
+														return isset($_GET[$key]) ? trim($_GET[$key]) : '';
+													}
+
+													$filters = [
+														'q' => getStr('q'),
+														'main' => getArray('main'),
+														'country' => getIntg('country'),
+														'city' => getIntg('city'),
+														'min_price' => getIntg('min_price'),
+														'max_price' => getIntg('max_price'),
+														'sort' => $_GET['sort'] ?? 'new',
+													];
+
+													$where = ["l.status = 'active'", "plc.listing_id IS NOT NULL"];
+													$params = [];
+
+													// main (multi)
+													if (!empty($filters['main'])) {
+														$placeholders = implode(',', array_fill(0, count($filters['main']), '?'));
+														$where[] = "l.main_category_id IN ($placeholders)";
+														$params = array_merge($params, $filters['main']);
+													}
+
+													// country
+													if ($filters['country']) {
+														$where[] = "ctry.id = ?";
+														$params[] = $filters['country'];
+													}
+
+													// city
+													if ($filters['city']) {
+														$where[] = "city.id = ?";
+														$params[] = $filters['city'];
+													}
+
+													// text
+													if ($filters['q']) {
+														$where[] = "(l.title LIKE ? OR l.description LIKE ?)";
+														$params[] = "%{$filters['q']}%";
+														$params[] = "%{$filters['q']}%";
+													}
+
+													// price
+													if ($filters['min_price']) {
+														$where[] = "l.price >= ?";
+														$params[] = $filters['min_price'];
+													}
+
+													if ($filters['max_price']) {
+														$where[] = "l.price <= ?";
+														$params[] = $filters['max_price'];
+													}
+
+													$whereSql = "WHERE " . implode(' AND ', $where);
+
+
+													$selectedMain = $_GET['main'] ?? [];
+
+													if (!is_array($selectedMain)) {
+														$selectedMain = [$selectedMain];
+													}
+													?>
+
+													<?php
+													$main = $pdo->query("SELECT id, name FROM listing_categories_main ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
+													foreach ($main as $m): ?>
+														<li>
+															<label class="custom_check">
+																<?php
+																$selectedMain = $_GET['main'] ?? null;
+																?>
+
+																<input type="checkbox" name="main[]" value="<?= $m['id'] ?>"
+																	<?= in_array($m['id'], $selectedMain) ? 'checked' : '' ?>>
+																<span class="checkmark"></span>
+																<?= htmlspecialchars($m['name']) ?>
+															</label>
+														</li>
+
+													<?php endforeach; ?>
+
+												</ul>
+											</div>
+
+
+
+											<div class="filter-content form-set">
+												<select class="form-control" name="country" id="countrySelect">
+													<option value="">Ölkə</option>
+													<?php
+													$country = $pdo->query("SELECT id, `name` FROM countries WHERE `status`='active' ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC); ?>
+													<?php foreach ($country as $cntry): ?>
+														<option value="<?= $cntry['id'] ?>" <?= ($_GET['country'] ?? '') == $cntry['id'] ? 'selected' : '' ?>>
+															<?= htmlspecialchars($cntry['name']) ?>
+														</option>
+													<?php endforeach; ?>
+												</select>
+											</div>
+
+											<div class="filter-content form-set">
+												<?php
+												$city = $pdo->query("SELECT id, name, country_id FROM cities ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
+												?>
+
+												<select class="form-control" name="city" id="citySelect">
+													<option value="">Şəhər</option>
+
+													<?php foreach ($city as $cty): ?>
+														<option value="<?= $cty['id'] ?>"
+															data-country="<?= $cty['country_id'] ?>" <?= ($_GET['city'] ?? '') == $cty['id'] ? 'selected' : '' ?>>
+															<?= htmlspecialchars($cty['name']) ?>
+														</option>
+													<?php endforeach; ?>
+												</select>
+											</div>
+
+											<div class="filter-content amenities mb-0">
+												<h4>Qiymət aralığı</h4>
+												<div class="form-set mb-0">
+													<input type="text" name="min_price"
+														value="<?= htmlspecialchars($_GET['min_price'] ?? '') ?>"
+														placeholder="Min">
+
+													<input type="text" name="max_price"
+														value="<?= htmlspecialchars($_GET['max_price'] ?? '') ?>"
+														placeholder="Max">
+												</div>
+												<div class="search-btn">
+													<button class="btn btn-primary" type="submit">Tətbiq et</button>
+													<a href="listings" class="btn btn-reset">Filteri təmizlə</a>
+												</div>
+											</div>
+
+											<script>
+												const countrySelect = document.getElementById('countrySelect');
+												const citySelect = document.getElementById('citySelect');
+
+												if (countrySelect && citySelect) {
+
+													countrySelect.addEventListener('change', function () {
+														const countryId = this.value;
+														const currentCity = citySelect.value;
+
+														Array.from(citySelect.options).forEach(opt => {
+															if (!opt.value) return;
+
+															if (!countryId) {
+																opt.hidden = false;
+															} else {
+																opt.hidden = opt.dataset.country !== countryId;
+															}
+														});
+
+														if (!citySelect.querySelector(`option[value="${currentCity}"]:not([hidden])`)) {
+															citySelect.value = '';
+														}
+													});
+
+													window.addEventListener('load', () => {
+														countrySelect.dispatchEvent(new Event('change'));
+													});
+												}
+											</script>
+										</form>
+									</div>
+								</div>
+							</div> -->
