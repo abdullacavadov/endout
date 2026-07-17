@@ -1,21 +1,81 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . "/../../inc/config.php";
 
-$orderId = (int)$_GET['order_id'];
+require_once __DIR__ . "/PaymentService.php";
+require_once __DIR__ . "/PaymentProcessor.php";
 
-// order çək
-$stmt = $pdo->prepare("SELECT * FROM orders WHERE id=?");
-$stmt->execute([$orderId]);
-$order = $stmt->fetch();
+require_once __DIR__ . "/../../services/payment/gateway/TestGateway.php";
 
-// ⚠️ yenidən hesabla
-$real = calculateTotal($pdo, $order['market_id'], $order['package_id'], 3, $order['currency']);
+header('Content-Type: application/json');
 
-if (abs($real - $order['amount']) > 0.01) {
-    // fraud
-    $pdo->prepare("UPDATE orders SET status='fraud' WHERE id=?")->execute([$orderId]);
-    die("Fraud detected");
+try {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Callback payload
+    |--------------------------------------------------------------------------
+    */
+
+    $payload = json_decode(
+        file_get_contents('php://input'),
+        true
+    );
+
+    if (!is_array($payload)) {
+        $payload = $_POST;
+    }
+
+    if (!is_array($payload)) {
+        throw new Exception('Invalid callback payload.');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Gateway
+    |--------------------------------------------------------------------------
+    */
+
+    $gateway = new TestGateway();
+
+    $paymentService = new PaymentService(
+        $pdo,
+        $gateway
+    );
+
+    $processor = new PaymentProcessor(
+        $pdo,
+        $paymentService,
+        $gateway
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Callback emalı
+    |--------------------------------------------------------------------------
+    */
+
+    $result = $processor->handleCallback($payload);
+
+
+    echo json_encode(array_merge(
+        [
+            'ok' => true
+        ],
+        $result
+    ));
+
+} catch (Throwable $e) {
+
+    http_response_code(400);
+
+    echo json_encode([
+        'ok' => false,
+        'message' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ]);
 }
-
-// success
-$pdo->prepare("UPDATE orders SET status='paid' WHERE id=?")->execute([$orderId]);

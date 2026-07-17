@@ -23,7 +23,7 @@ try {
 
 
     $customerId = (int) $_SESSION['customer_id'];
-
+    //$customerId = 40; // Test üçün müvəqqəti olaraq istifadə olunur
 
 
     $input = json_decode(
@@ -46,10 +46,13 @@ try {
 
 
     $marketId = (int) ($input['market_id'] ?? 0);
-
+    //$marketId = 36; // Test üçün müvəqqəti olaraq istifadə olunur
+    
     $months = (int) ($input['months'] ?? 0);
+    //$months = 12; // Test üçün müvəqqəti olaraq istifadə olunur
 
     $packageId = (int) ($input['package_id'] ?? 0);
+    //$packageId = 11; // Test üçün müvəqqəti olaraq istifadə olunur
 
 
 
