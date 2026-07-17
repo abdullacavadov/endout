@@ -60,9 +60,14 @@ $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // 5) Paket feature-ları
 $stmt = $pdo->prepare("
-  SELECT package_id, feature_key, value_type, feature_value
-  FROM package_features
-  WHERE is_active = 1
+  SELECT 
+    pf.package_id, 
+    pf.feature_key, 
+    pf.feature_value,
+    fd.value_type
+  FROM package_features pf
+  LEFT JOIN feature_definitions fd ON fd.feature_key = pf.feature_key
+  WHERE pf.is_active = 1
 ");
 $stmt->execute();
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);

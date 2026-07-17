@@ -304,7 +304,7 @@ function fmtMoney($n)
 				<span class="btn btn-danger close">&times;</span>
 				<h5>Qiymət hesablama siyasəti</h5>
 				<small class="mt-2">
-					{Ümumi auditoriya sayı} / 10.000.000 * {Seçilən paketin aylıq qiyməti}
+					{Ümumi auditoriya sayı} / 10.000.000 * {Ölkə əmsalı} * {Seçilən paketin aylıq qiyməti}
 				</small>
 				<br>
 				<small><i>Qeyd: İlk mərhələdə bir neçə ayın ödənişi əvvəlcədən edilərsə seçilən paketə uyğun olaraq
@@ -724,23 +724,50 @@ function fmtMoney($n)
 					const featuresWrap = card.querySelector(".price-features");
 
 					const FEATURE_LABELS = {
-						max_post: (v) => `${v} post paylaşımı`,
-
-						
-
-						max_countries: (v) => {
+						max_post: (v) => {
 							if (Number(v) === 9999) {
-								return "Limitsiz ölkə seçimi";
+								return "<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> Limitsiz post paylaşımı</span>";
+							} else if (Number(v) === 0) {
+								return "<span><i class='fa-solid fa-circle-xmark' style='color: rgb(185, 22, 22);'></i> Post paylaşımı</span>";
 							}
 
-							return `${v} ölkə seçimi`;
+							return `<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> ${v} post paylaşımı</span>`;
+						},
+						
+						
+						max_countries: (v) => {
+							if (Number(v) === 9999) {
+								return "<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> Limitsiz ölkə seçimi</span>";
+							} else if (Number(v) === 0) {
+								return "<span><i class='fa-solid fa-circle-xmark' style='color: rgb(185, 22, 22);'></i> Ölkə seçimi</span>";
+							}
+
+							return `<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> ${v} ölkə seçimi</span>`;
 						},
 
-						max_reels: (v) => v>0 ? `${v} reels paylaşımı` : null,
+						max_reels: (v) => {
+							if (Number(v) === 9999) {
+								return "<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> Limitsiz reels paylaşımı</span>";
+							} else if (Number(v) === 0) {
+								return "<span><i class='fa-solid fa-circle-xmark' style='color: rgb(185, 22, 22);'></i> Reels paylaşımı</span>";
+							}
 
-						analytics_enabled: (v) => v == 1 ? "Analitika" : null,
+							return `<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> ${v} reels paylaşımı</span>`;
+						},
+
+						max_tender: (v) => {
+							if (Number(v) === 9999) {
+								return "<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> Limitsiz tender paylaşımı</span>";
+							} else if (Number(v) === 0) {
+								return "<span><i class='fa-solid fa-circle-xmark' style='color: rgb(185, 22, 22);'></i> Tender paylaşımı</span>";
+							}
+
+							return `<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> ${v} tender paylaşımı</span>`;
+						},
+
+						analytics_enabled: (v) => v == 1 ? "<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> Analitika</span>" : "<span><i class='fa-solid fa-circle-xmark' style='color: rgb(185, 22, 22);'></i> Analitika</span>",
 						
-						priority_support: (v) => v == 1 ? "Prioritet dəstək" : null
+						priority_support: (v) => v == 1 ? "<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> Prioritet dəstək" : "<span><i class='fa-solid fa-circle-xmark' style='color: rgb(185, 22, 22);'></i> Prioritet dəstək</span>",
 					};
 
 					featuresWrap.innerHTML = features.map(f => {
@@ -754,8 +781,7 @@ function fmtMoney($n)
 
 						return `
 							<p>
-								<i class="fa-solid fa-circle-check"></i>
-								${escapeHtml(text)}
+								${text}
 							</p>
 						`;
 					}).filter(Boolean).join("");

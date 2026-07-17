@@ -126,9 +126,12 @@ function calculateTotal($pdo, $marketId, $packageId, $months, $targetCurrency, $
     }
 
     $stmt = $pdo->prepare("
-        SELECT id, feature_key, feature_value
-        FROM package_features
-        WHERE package_id = ?
+        SELECT pf.id, pf.feature_key, pf.feature_value
+        FROM package_features pf
+        LEFT JOIN feature_definitions fd ON fd.feature_key = pf.feature_key
+        WHERE pf.is_active = 1
+        AND package_id = ?
+        ORDER BY fd.sort_order ASC
     ");
     $stmt->execute([$packageId]);
     $features = $stmt->fetchAll(PDO::FETCH_ASSOC);
