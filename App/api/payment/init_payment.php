@@ -10,10 +10,10 @@ require_once __DIR__ . "/../_helpers.php";
 header('Content-Type: application/json');
 
 try {
-    //require_login($pdo);
+    require_login($pdo);
 
-    //$customerId = (int) $_SESSION['customer_id'];
-    $customerId = 40; // Test üçün müvəqqəti olaraq istifadə olunur
+    $customerId = (int) $_SESSION['customer_id'];
+    //$customerId = 40; // Test üçün müvəqqəti olaraq istifadə olunur
     $input = json_decode(
         file_get_contents("php://input"),
         true
