@@ -2,7 +2,7 @@
 
 <?php
 if (!isset($_GET['pid']) || empty($_GET['pid'])) {
-    header("Location: staff-members.php");
+    header("Location: packages.php");
     exit();
 }
 

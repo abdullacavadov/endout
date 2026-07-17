@@ -36,7 +36,12 @@
                                 </ol>
                             </nav>
                         </div>
-                        <div class="">
+                        <div class="d-flex gap-2">
+                            <a href="package-features.php" class="btn btn-warning d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-gears"></i>
+                                Limit və xüsusiyyətlər
+                            </a>
+
                             <a href="package-add.php" class="btn btn-primary d-flex align-items-center gap-2">
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
