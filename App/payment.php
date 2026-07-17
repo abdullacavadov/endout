@@ -595,10 +595,11 @@ function fmtMoney($n)
 						body: fd
 					});
 
+
 					const data = await res.json().catch(() => null);
 
 					if (!data || !data.ok) {
-						console.error("Calc error");
+						console.error("Calc error " + (data?.message || "Unknown error"));
 						return;
 					}
 
@@ -733,8 +734,8 @@ function fmtMoney($n)
 
 							return `<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> ${v} post paylaşımı</span>`;
 						},
-						
-						
+
+
 						max_countries: (v) => {
 							if (Number(v) === 9999) {
 								return "<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> Limitsiz ölkə seçimi</span>";
@@ -766,7 +767,7 @@ function fmtMoney($n)
 						},
 
 						analytics_enabled: (v) => v == 1 ? "<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> Analitika</span>" : "<span><i class='fa-solid fa-circle-xmark' style='color: rgb(185, 22, 22);'></i> Analitika</span>",
-						
+
 						priority_support: (v) => v == 1 ? "<span><i class='fa-solid fa-circle-check' style='color: rgb(22, 185, 136);'></i> Prioritet dəstək" : "<span><i class='fa-solid fa-circle-xmark' style='color: rgb(185, 22, 22);'></i> Prioritet dəstək</span>",
 					};
 
