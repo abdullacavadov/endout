@@ -7,6 +7,7 @@ require_once __DIR__ . "/PaymentService.php";
 require_once __DIR__ . "/PaymentProcessor.php";
 
 require_once __DIR__ . "/../../services/payment/gateway/TestGateway.php";
+require_once __DIR__ . '/../../services/payment/gateway/BirBankGateway.php';
 
 header('Content-Type: application/json');
 
@@ -24,7 +25,7 @@ try {
     );
 
     if (!is_array($payload)) {
-        $payload = $_POST;
+        $payload = $_GET;
     }
 
     if (!is_array($payload)) {
@@ -38,7 +39,15 @@ try {
     |--------------------------------------------------------------------------
     */
 
-    $gateway = new TestGateway();
+    //$gateway = new TestGateway(); // Test üçün müvəqqəti olaraq istifadə olunur
+
+    //Birbank Gateway konfiqurasiyası
+    $gateway = new BirBankGateway(
+        'https://txpgtst.kapitalbank.az/api',
+        'TerminalSys/kapital',
+        'kapital123',
+        'http://localhost/endout/App/api/payment/callback.php'
+    );
 
     $paymentService = new PaymentService(
         $pdo,
@@ -57,6 +66,7 @@ try {
     | Callback emalı
     |--------------------------------------------------------------------------
     */
+
 
     $result = $processor->handleCallback($payload);
 

@@ -27,18 +27,23 @@ class BirBankGateway implements PaymentGatewayInterface
     {
         return match (strtolower(trim($status))) {
 
-            'preparing' => 'initiated',
+            'preparing',
+            'being prepared' => 'initiated',
 
-            'fully paid' => 'paid',
-            'fullypaid' => 'paid',
+            'authorized',
+            'fully paid',
+            'partially paid',
+            'funded',
+            'closed' => 'paid',
 
             'refunded' => 'refunded',
 
-            'cancelled' => 'failed',
-            'rejected' => 'failed',
-            'refused' => 'failed',
-            'expired' => 'failed',
-            'declined' => 'failed',
+            'cancelled',
+            'rejected',
+            'refused',
+            'expired',
+            'declined',
+            'voided' => 'failed',
 
             default => 'failed',
         };
@@ -51,6 +56,8 @@ class BirBankGateway implements PaymentGatewayInterface
 
     public function createPayment(array $payment): array
     {
+
+
         $response = $this->request(
             'POST',
             '/order',
@@ -67,6 +74,9 @@ class BirBankGateway implements PaymentGatewayInterface
             ]
         );
 
+        // var_dump($response);
+        // exit;
+
         if (!isset($response['order'])) {
             throw new Exception('Invalid BirBank response.');
         }
@@ -79,7 +89,7 @@ class BirBankGateway implements PaymentGatewayInterface
             'status' => $this->mapStatus($order['status']),
             'raw_response' => $response,
             'redirect_url' => rtrim($order['hppUrl'], '/')
-                . '/flex?id='
+                . '?id='
                 . $order['id']
                 . '&password='
                 . urlencode($order['password']),
