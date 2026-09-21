@@ -988,6 +988,100 @@ function fmtMoney($n)
 			});
 
 			// =========================
+			// PAYMENT
+			// =========================
+
+			payBtn.addEventListener("click", async () => {
+				if (payBtn.disabled) return;
+
+				const packageId = selectedPackageId();
+				const months = selectedMonths();
+				const marketId = Number(DATA.market.id);
+
+				if (!packageId || !months || !marketId) {
+					await Swal.fire({
+						title: "Xəta",
+						text: "Ödəniş üçün paket və müddət seçilməlidir.",
+						icon: "error",
+						confirmButtonText: "Bağla"
+					});
+					return;
+				}
+
+				payBtn.disabled = true;
+				const originalText = payBtn.textContent;
+				payBtn.textContent = "Ödəniş hazırlanır...";
+
+				try {
+					/*
+					 * 1. Əvvəlcə local order yaradılır.
+					 * Məbləğ client-dən götürülmür; server özü hesablayır.
+					 */
+					const orderResponse = await fetch("<?= $base_url ?>/api/payment/create_order.php", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({
+							_csrf: csrfToken.value,
+							market_id: marketId,
+							months: months,
+							package_id: packageId
+						})
+					});
+
+					const orderData = await orderResponse.json().catch(() => null);
+
+					if (!orderData || !orderData.ok || !orderData.order_id) {
+						throw new Error(
+							orderData?.message || "Sifariş yaradıla bilmədi."
+						);
+					}
+
+					/*
+					 * 2. Yaradılmış order üçün BirBank payment başlanır.
+					 */
+					const paymentResponse = await fetch("<?= $base_url ?>/api/payment/init_payment.php", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({
+							_csrf: csrfToken.value,
+							order_id: Number(orderData.order_id),
+							provider: "birbank"
+						})
+					});
+
+					const paymentData = await paymentResponse.json().catch(() => null);
+
+					if (!paymentData || !paymentData.ok || !paymentData.redirect_url) {
+						throw new Error(
+							paymentData?.message || "BirBank ödənişi başladılmadı."
+						);
+					}
+
+					/*
+					 * 3. BirBank HPP səhifəsinə keç.
+					 */
+					window.location.href = paymentData.redirect_url;
+
+				} catch (error) {
+					console.error("Payment error:", error);
+
+					payBtn.disabled = false;
+					payBtn.textContent = originalText;
+
+					await Swal.fire({
+						title: "Ödəniş xətası",
+						text: error?.message || "Ödəniş başlatmaq mümkün olmadı.",
+						icon: "error",
+						confirmButtonText: "Bağla"
+					});
+				}
+			});
+
+			// =========================
 			// INIT
 			// =========================
 			function initCurrencySelect() {
