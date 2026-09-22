@@ -179,6 +179,22 @@ class PaymentService
         return $result ?: null;
     }
 
+    public function lockCustomer(int $customerId): void
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT id
+            FROM customers
+            WHERE id = :id
+            FOR UPDATE
+        ");
+
+        $stmt->execute([':id' => $customerId]);
+
+        if (!$stmt->fetchColumn()) {
+            throw new Exception('Customer not found.');
+        }
+    }
+
     public function findLatestActiveSubscription(int $customerId): ?array
     {
         $stmt = $this->pdo->prepare("
@@ -242,6 +258,24 @@ class PaymentService
             ':ends_at' => $endsAt,
             ':price_paid' => $pricePaid,
             ':currency' => $currency,
+            ':id' => $subscriptionId
+        ]);
+    }
+
+    public function cancelSubscription(int $subscriptionId): bool
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE customer_subs
+            SET
+                status = 'canceled',
+                canceled_at = NOW(),
+                cancel_at_period_end = 0,
+                updated_at = NOW()
+            WHERE id = :id
+              AND status = 'active'
+        ");
+
+        return $stmt->execute([
             ':id' => $subscriptionId
         ]);
     }
