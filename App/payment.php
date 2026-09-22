@@ -1020,10 +1020,10 @@ function fmtMoney($n)
 					const orderResponse = await fetch("<?= $base_url ?>/api/payment/create_order.php", {
 						method: "POST",
 						headers: {
-							"Content-Type": "application/json"
+							"Content-Type": "application/json",
+							"X-CSRF-Token": csrfToken.value
 						},
 						body: JSON.stringify({
-							_csrf: csrfToken.value,
 							market_id: marketId,
 							months: months,
 							package_id: packageId
@@ -1044,10 +1044,10 @@ function fmtMoney($n)
 					const paymentResponse = await fetch("<?= $base_url ?>/api/payment/init_payment.php", {
 						method: "POST",
 						headers: {
-							"Content-Type": "application/json"
+							"Content-Type": "application/json",
+							"X-CSRF-Token": csrfToken.value
 						},
 						body: JSON.stringify({
-							_csrf: csrfToken.value,
 							order_id: Number(orderData.order_id),
 							provider: "birbank"
 						})
