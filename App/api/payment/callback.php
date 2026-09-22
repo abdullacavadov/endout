@@ -33,8 +33,11 @@ try {
 
     $result = $processor->handleCallback($payload);
 
-    $target = $base_url
-        . '/payment-result.php?payment_id='
+    // callback.php App/api/payment qovluğundadır; nəticə səhifəsi isə App/payment-result.php-dir.
+    $app_root_url = rtrim(dirname(dirname(dirname($base_url))), '/');
+
+    $target = $app_root_url
+        . '/App/payment-result.php?payment_id='
         . (int) $result['payment_id'];
 
     header('Location: ' . $target, true, 303);
