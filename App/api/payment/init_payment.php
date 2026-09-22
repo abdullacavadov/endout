@@ -57,8 +57,25 @@ try {
         throw new Exception("Unauthorized order");
     }
 
-    if ($order['status'] !== 'pending') {
+    if (!in_array($order['status'], ['pending', 'failed'], true)) {
         throw new Exception("Order artıq emaldadır");
+    }
+
+    if ($order['status'] === 'failed') {
+        $resetStmt = $pdo->prepare("
+            UPDATE orders
+            SET status = 'pending'
+            WHERE id = ?
+              AND customer_id = ?
+              AND status = 'failed'
+        ");
+
+        $resetStmt->execute([
+            $orderId,
+            $customerId
+        ]);
+
+        $order['status'] = 'pending';
     }
 
     $provider = strtolower((string) ($input['provider'] ?? 'birbank'));
