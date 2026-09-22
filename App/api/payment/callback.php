@@ -33,8 +33,6 @@ try {
 
     $result = $processor->handleCallback($payload);
 
-    $status = (string) ($result['status'] ?? '');
-
     $target = $base_url
         . '/payment-result.php?payment_id='
         . (int) $result['payment_id'];
