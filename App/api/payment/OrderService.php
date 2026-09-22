@@ -10,16 +10,11 @@ class OrderService
         $this->pdo = $pdo;
     }
 
-
-    /**
-     * Yeni sifariş yaradır
-     */
     public function create(array $data): int
     {
         $this->pdo->beginTransaction();
 
         try {
-
             $stmt = $this->pdo->prepare("
                 INSERT INTO orders (
                     customer_id,
@@ -36,52 +31,37 @@ class OrderService
                     :subtotal,
                     :discount,
                     :total,
-                    :status,
+                    'pending',
                     NOW()
                 )
             ");
 
             $stmt->execute([
                 ':customer_id' => $data['customer_id'],
-                ':currency'  => $data['currency'] ?? 'AZN',
-                ':subtotal'  => $data['subtotal'],
-                ':discount'  => $data['discount'] ?? 0,
-                ':total'     => $data['total'],
-                ':status'    => 'pending'
+                ':currency' => $data['currency'] ?? 'AZN',
+                ':subtotal' => $data['subtotal'],
+                ':discount' => $data['discount'] ?? 0,
+                ':total' => $data['total']
             ]);
 
-
-            $orderId = (int)$this->pdo->lastInsertId();
-
+            $orderId = (int) $this->pdo->lastInsertId();
 
             if (!empty($data['items'])) {
-
-                $this->addItems(
-                    $orderId,
-                    $data['items']
-                );
-
+                $this->addItems($orderId, $data['items']);
             }
-
 
             $this->pdo->commit();
 
             return $orderId;
-
-
         } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
 
-            $this->pdo->rollBack();
             throw $e;
-
         }
     }
 
-
-
-    /**
-     * Sifariş paketlərini əlavə edir
-     */
     private function addItems(int $orderId, array $items): void
     {
         $stmt = $this->pdo->prepare("
@@ -91,7 +71,8 @@ class OrderService
                 package_name,
                 qty,
                 price,
-                total
+                total,
+                months
             )
             VALUES (
                 :order_id,
@@ -99,35 +80,28 @@ class OrderService
                 :package_name,
                 :qty,
                 :price,
-                :total
+                :total,
+                :months
             )
         ");
 
-
         foreach ($items as $item) {
-
             $stmt->execute([
-                ':order_id'     => $orderId,
-                ':package_id'   => $item['package_id'],
+                ':order_id' => $orderId,
+                ':package_id' => $item['package_id'],
                 ':package_name' => $item['package_name'],
-                ':qty'          => $item['qty'],
-                ':price'        => $item['price'],
-                ':total'        => $item['total']
+                ':qty' => $item['qty'],
+                ':price' => $item['price'],
+                ':total' => $item['total'],
+                ':months' => $item['months']
             ]);
-
         }
     }
 
-
-
-    /**
-     * Status dəyişmək üçün
-     */
     public function updateStatus(
         int $orderId,
         string $status
     ): bool {
-
         $stmt = $this->pdo->prepare("
             UPDATE orders
             SET status = :status
@@ -139,6 +113,4 @@ class OrderService
             ':id' => $orderId
         ]);
     }
-
-
 }
