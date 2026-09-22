@@ -89,7 +89,13 @@ $message = $isSuccess
             <div class="card mx-auto" style="max-width: 620px;">
                 <div class="card-body text-center p-5">
                     <div class="mb-3" style="font-size: 48px;">
-                        <?= $isSuccess ? '✓' : ($isFailed ? '×' : '…') ?>
+                        <?php if ($isSuccess) : ?>
+                            <i class="fa-solid fa-check text-success"></i>
+                        <?php elseif ($isFailed) : ?>
+                            <i class="fa-solid fa-x text-danger"></i>
+                        <?php else : ?>
+                           ...
+                        <?php endif; ?>
                     </div>
 
                     <h3><?= htmlspecialchars($title) ?></h3>
