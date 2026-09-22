@@ -202,6 +202,7 @@ class PaymentService
             FROM customer_subs
             WHERE cust_id = :cust_id
               AND status = 'active'
+              AND ends_at >= NOW()
             ORDER BY ends_at DESC, id DESC
             LIMIT 1
         ");
