@@ -142,6 +142,10 @@ class PaymentProcessor
                     throw new Exception('Purchased package is no longer active.');
                 }
 
+                $this->paymentService->lockCustomer(
+                    (int) $payment['cust_id']
+                );
+
                 $subscription = $this->paymentService
                     ->findLatestActiveSubscription((int) $payment['cust_id']);
 
@@ -232,6 +236,12 @@ class PaymentProcessor
                     (int) $payment['id'],
                     'refunded'
                 );
+
+                if (!empty($payment['sub_id'])) {
+                    $this->paymentService->cancelSubscription(
+                        (int) $payment['sub_id']
+                    );
+                }
 
                 $stmt = $this->pdo->prepare("
                     UPDATE orders
