@@ -35,9 +35,9 @@ try {
 
     $status = (string) ($result['status'] ?? '');
 
-    $target = $status === 'paid'
-        ? '/payment-result.php?payment_id=' . (int) $result['payment_id']
-        : '/payment-result.php?payment_id=' . (int) $result['payment_id'];
+    $target = $base_url
+        . '/payment-result.php?payment_id='
+        . (int) $result['payment_id'];
 
     header('Location: ' . $target, true, 303);
     exit;
