@@ -1,0 +1,6 @@
+# Local payment configuration / secrets
+App/inc/payment_config.local.php
+
+# Environment files
+.env
+.env.*
