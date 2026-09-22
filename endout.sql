@@ -49232,6 +49232,7 @@ CREATE TABLE `order_items` (
   `qty` int(10) UNSIGNED NOT NULL DEFAULT 1,
   `price` decimal(12,2) NOT NULL DEFAULT 0.00,
   `total` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `months` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
