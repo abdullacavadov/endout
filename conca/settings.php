@@ -1,4 +1,4 @@
-<?php require_once("inc/config.php"); ?>
+<?php require_once("inc/config.php"); require_once("inc/admin_auth.php"); require_admin_permission($pdo, "settings"); ?>
 
 <?php
 
