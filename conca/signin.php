@@ -1,45 +1,111 @@
 <?php
-declare(strict_types=1);
 require_once("inc/db.php");
 
 $statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=1");
 $statement->execute();
-$row = $statement->fetch(PDO::FETCH_ASSOC) ?: [];
+$result = $statement->fetchAll(PDO::FETCH_ASSOC);
+$row = $result[0] ?? [];
 
-$logo=$row['logo']??'';$meta_title_home=$row['meta_title_home']??'EndOut';$base_url=$row['base_url']??'';$time_zone=$row['time_zone']??'Asia/Baku';
-define("BASE_URL",$base_url);
-define("ADMIN_URL",BASE_URL.($row['admin_url']??'')."/");
-date_default_timezone_set($time_zone);
-ini_set('display_errors','0');ini_set('log_errors','1');
+$confirm_code = $row['confirm_code'] ?? '';
+$logo = $row['logo'] ?? '';
+$meta_title_home = $row['meta_title_home'] ?? 'EndOut';
+$base_url = $row['base_url'] ?? '';
+$time_zone = $row['time_zone'] ?? 'Asia/Baku';
+$admin_url = $row['admin_url'] ?? '';
+$google_client_id = $row['google_client_id'] ?? '';
+$google_client_secret = $row['google_client_secret'] ?? '';
+
+define("BASE_URL", $base_url);
+define("ADMIN_URL", BASE_URL . $admin_url . "/");
+define('CONFIRM_DELETE_KEY', $confirm_code);
+define('GOOGLE_CLIENT_ID', $google_client_id);
+define('GOOGLE_CLIENT_SECRET', $google_client_secret);
+
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
+try {
+    date_default_timezone_set($time_zone ?: 'Asia/Baku');
+} catch (Throwable $e) {
+    date_default_timezone_set('Asia/Baku');
+    error_log('Invalid admin timezone: ' . $e->getMessage());
+}
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 include("inc/CSRF_Protect.php");
-$csrf=new CSRF_Protect();
-$error_message='';
 
-if(isset($_POST['login'])){
+$csrf = new CSRF_Protect();
+$error_message = '';
+
+if (isset($_POST['login'])) {
     $csrf->verifyRequest();
-    $email=trim((string)($_POST['email']??''));
-    $password=(string)($_POST['pass']??'');
-    $ip=$_SERVER['REMOTE_ADDR']??null;
 
-    $rate=$pdo->prepare("SELECT COUNT(*) FROM admin_login_attempts WHERE success=0 AND created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) AND (email=? OR ip_address=?)");
-    $rate->execute([$email,$ip]);
-    if((int)$rate->fetchColumn()>=8){
-        $error_message='Çox sayda uğursuz giriş cəhdi. 15 dəqiqə sonra yenidən cəhd edin.';
-    }elseif(!filter_var($email,FILTER_VALIDATE_EMAIL)){
-        $error_message='Email və ya şifrə yanlışdır.';
-    }else{
-        $statement=$pdo->prepare("SELECT * FROM tbl_user WHERE email=? AND status='Active' LIMIT 1");
-        $statement->execute([$email]);$admin=$statement->fetch(PDO::FETCH_ASSOC);
-        if(!$admin || !password_verify($password,(string)$admin['password'])){
-            $pdo->prepare("INSERT INTO admin_login_attempts(email,ip_address,success) VALUES(?,?,0)")->execute([$email,$ip]);
-            $error_message='Email və ya şifrə yanlışdır.';
-        }else{
+    $email = trim((string)($_POST['email'] ?? ''));
+    $password = (string)($_POST['pass'] ?? '');
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+
+    /*
+     * Rate-limit cədvəli migration tətbiq olunmayıbsa belə login səhifəsi
+     * HTTP 500 verməməlidir. Migration tətbiq olunandan sonra limit aktivdir.
+     */
+    $attemptsTableAvailable = true;
+    try {
+        $rate = $pdo->prepare("SELECT COUNT(*) FROM admin_login_attempts WHERE success=0 AND created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) AND (email=? OR ip_address=?)");
+        $rate->execute([$email, $ip]);
+
+        if ((int)$rate->fetchColumn() >= 8) {
+            $error_message = 'Çox sayda uğursuz giriş cəhdi. 15 dəqiqə sonra yenidən cəhd edin.';
+        }
+    } catch (Throwable $e) {
+        $attemptsTableAvailable = false;
+        error_log('Admin login rate-limit table unavailable: ' . $e->getMessage());
+    }
+
+    if ($error_message === '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error_message = 'Email və ya şifrə yanlışdır.';
+    }
+
+    if ($error_message === '') {
+        $statement = $pdo->prepare("SELECT * FROM tbl_user WHERE email=? AND status='Active' LIMIT 1");
+        $statement->execute([$email]);
+        $admin = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if (!$admin || !password_verify($password, (string)$admin['password'])) {
+            if ($attemptsTableAvailable) {
+                try {
+                    $pdo->prepare("INSERT INTO admin_login_attempts(email,ip_address,success) VALUES(?,?,0)")
+                        ->execute([$email, $ip]);
+                } catch (Throwable $e) {
+                    error_log('Admin login attempt logging failed: ' . $e->getMessage());
+                }
+            }
+            $error_message = 'Email və ya şifrə yanlışdır.';
+        } else {
             session_regenerate_id(true);
-            $_SESSION['user']=$admin;
-            $pdo->prepare("INSERT INTO admin_login_attempts(email,ip_address,success) VALUES(?,?,1)")->execute([$email,$ip]);
-            $pdo->prepare("INSERT INTO admin_sessions(admin_id,session_id,ip_address,user_agent) VALUES(?,?,?,?)")->execute([(int)$admin['id'],session_id(),$ip,substr((string)($_SERVER['HTTP_USER_AGENT']??''),0,255)]);
-            header("Location: index.php");exit;
+            $_SESSION['user'] = $admin;
+
+            if ($attemptsTableAvailable) {
+                try {
+                    $pdo->prepare("INSERT INTO admin_login_attempts(email,ip_address,success) VALUES(?,?,1)")
+                        ->execute([$email, $ip]);
+
+                    $pdo->prepare("INSERT INTO admin_sessions(admin_id,session_id,ip_address,user_agent) VALUES(?,?,?,?)")
+                        ->execute([
+                            (int)$admin['id'],
+                            session_id(),
+                            $ip,
+                            substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255)
+                        ]);
+                } catch (Throwable $e) {
+                    error_log('Admin session logging failed: ' . $e->getMessage());
+                }
+            }
+
+            header("Location: index.php");
+            exit();
         }
     }
 }
