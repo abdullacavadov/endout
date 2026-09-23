@@ -251,30 +251,42 @@ require_once __DIR__ . "/api/data/subscription_data.php";
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 	<script>
-		// ===== DATA =====
-		const startDateStr = "2026-01-15 15:30:00";
-		const INTERVAL_DAYS = 30;
+		// ===== REAL SUBSCRIPTION DATA =====
+		const hasActiveSub = <?= $hasActiveSub ? 'true' : 'false'; ?>;
+		const subscriptionPackage = <?= json_encode($sub_package_name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+		const subscriptionStart = <?= json_encode($activeSub['starts_at'] ?? '', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+		const subscriptionEnd = <?= json_encode($activeSub['ends_at'] ?? '', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 
-		const startDate = new Date(startDateStr.replace(" ", "T"));
+		let startDate = null;
+		let endDate = null;
+
+		if (hasActiveSub && subscriptionStart && subscriptionEnd) {
+			startDate = new Date(subscriptionStart.replace(" ", "T"));
+			endDate = new Date(subscriptionEnd.replace(" ", "T"));
+		}
+
 		const now = new Date();
 
-		const totalMs = INTERVAL_DAYS * 24 * 60 * 60 * 1000;
-		const endDate = new Date(startDate.getTime() + totalMs);
+		let percent = 0;
+		let remainingDays = 0;
+		let isExpired = false;
 
-		const passedMs = Math.min(Math.max(now - startDate, 0), totalMs);
-		const percent = passedMs / totalMs;
+		if (startDate && endDate && !Number.isNaN(startDate.getTime()) && !Number.isNaN(endDate.getTime())) {
+			const totalMs = Math.max(endDate.getTime() - startDate.getTime(), 1);
+			const passedMs = Math.min(Math.max(now.getTime() - startDate.getTime(), 0), totalMs);
 
-		const remainingDays = Math.max(
-			0,
-			Math.ceil((endDate - now) / (24 * 60 * 60 * 1000))
-		);
+			percent = passedMs / totalMs;
+			remainingDays = Math.max(
+				0,
+				Math.ceil((endDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+			);
 
-		const isExpired = remainingDays === 0;
+			isExpired = now.getTime() >= endDate.getTime();
+		}
 
-		const used = percent;
-		const remaining = 1 - percent;
+		const used = hasActiveSub ? percent : 0;
+		const remaining = hasActiveSub ? 1 - percent : 1;
 
-		// ===== HELPERS =====
 		function formatDMY(date) {
 			const d = String(date.getDate()).padStart(2, "0");
 			const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -299,55 +311,41 @@ require_once __DIR__ . "/api/data/subscription_data.php";
 				ctx.save();
 				ctx.textAlign = "center";
 
-				// Başlıq
 				ctx.font = "600 14px Arial";
 				ctx.fillStyle = "#111";
-				ctx.fillText("Premium Paket", x, y - 30);
+				ctx.fillText(
+					hasActiveSub ? subscriptionPackage : "Abunəlik yoxdur",
+					x,
+					y - 30
+				);
 
 				ctx.font = "12px Arial";
 
-				if (isExpired) {
-					// 🔴 Expired mesajı
+				if (!hasActiveSub) {
+					renewButtonArea = null;
+
+					ctx.fillStyle = "#d32f2f";
+					ctx.fillText(
+						"Xidmətlərdən istifadə üçün paket seçin",
+						x,
+						y - 5
+					);
+
+					ctx.fillStyle = "#666";
+					ctx.fillText(
+						"Abunəlik aktiv deyil",
+						x,
+						y + 17
+					);
+				} else if (isExpired) {
+					renewButtonArea = null;
+
 					ctx.fillStyle = "#d32f2f";
 					ctx.fillText(
 						"Abunə müddəti başa çatıb",
 						x,
-						y - 10 + messageOffset
+						y - 5 + messageOffset
 					);
-
-					// 🔴 Yenilə düyməsi
-					const btnWidth = 80;
-					const btnHeight = 28;
-					const btnY = y + 4 + messageOffset;
-
-					if (isRenewHover) {
-						ctx.shadowColor = "#d32f2f";
-						ctx.shadowBlur = 12;
-					}
-
-					ctx.fillStyle = "#d32f2f";
-					ctx.beginPath();
-					ctx.roundRect(
-						x - btnWidth / 2,
-						btnY,
-						btnWidth,
-						btnHeight,
-						6
-					);
-					ctx.fill();
-
-					ctx.shadowBlur = 0;
-
-					ctx.fillStyle = "#fff";
-					ctx.font = "600 12px Arial";
-					ctx.fillText("Yenilə", x, btnY + 19);
-
-					renewButtonArea = {
-						x: x - btnWidth / 2,
-						y: btnY,
-						width: btnWidth,
-						height: btnHeight,
-					};
 				} else {
 					renewButtonArea = null;
 
@@ -357,7 +355,11 @@ require_once __DIR__ . "/api/data/subscription_data.php";
 						x,
 						y + 5
 					);
-					ctx.fillText("Abunəliyin bitməsinə " + remainingDays + " gün qalıb", x, y + 25);
+					ctx.fillText(
+						"Abunəliyin bitməsinə " + remainingDays + " gün qalıb",
+						x,
+						y + 25
+					);
 				}
 
 				ctx.restore();
@@ -383,7 +385,7 @@ require_once __DIR__ . "/api/data/subscription_data.php";
 				ctx.arc(cx, cy, radius, 0, Math.PI * 2);
 				ctx.clip();
 
-				ctx.globalAlpha = isExpired ? 0.05 : 0.15;
+				ctx.globalAlpha = !hasActiveSub || isExpired ? 0.05 : 0.15;
 				ctx.drawImage(
 					bgImg,
 					chartArea.left,
@@ -405,7 +407,7 @@ require_once __DIR__ . "/api/data/subscription_data.php";
 				datasets: [
 					{
 						data: [used, remaining],
-						backgroundColor: isExpired
+						backgroundColor: !hasActiveSub || isExpired
 							? ["rgba(255,255,255,0)", "#999"]
 							: ["rgba(255,255,255,0)", "#990853"],
 						borderWidth: 0,
@@ -451,6 +453,7 @@ require_once __DIR__ . "/api/data/subscription_data.php";
 				chart.update();
 			}
 		});
+
 	</script>
 
 	<script>
