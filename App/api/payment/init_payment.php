@@ -109,8 +109,12 @@ try {
 } catch (Throwable $e) {
     http_response_code(400);
 
+    error_log('payment init failed: ' . $e->getMessage());
+
     echo json_encode([
         'ok' => false,
-        'message' => $e->getMessage()
+        'message' => $e instanceof Exception
+            ? $e->getMessage()
+            : 'Ödəniş başladılarkən xəta baş verdi.'
     ]);
 }
