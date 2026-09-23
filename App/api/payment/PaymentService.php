@@ -40,6 +40,8 @@ class PaymentService
         string $providerPaymentId,
         array $rawResponse
     ): bool {
+        $safeResponse = $this->sanitizeSensitiveData($rawResponse);
+
         $stmt = $this->pdo->prepare("
             UPDATE payments
             SET provider_payment_id = :provider_payment_id,
@@ -49,9 +51,41 @@ class PaymentService
 
         return $stmt->execute([
             ':provider_payment_id' => $providerPaymentId,
-            ':raw_response' => json_encode($rawResponse, JSON_UNESCAPED_UNICODE),
+            ':raw_response' => json_encode($safeResponse, JSON_UNESCAPED_UNICODE),
             ':id' => $paymentId
         ]);
+    }
+
+    private function sanitizeSensitiveData(mixed $value): mixed
+    {
+        $sensitiveKeys = [
+            'password',
+            'passwd',
+            'secret',
+            'token',
+            'access_token',
+            'refresh_token',
+            'authorization',
+            'private_key',
+            'api_key'
+        ];
+
+        if (!is_array($value)) {
+            return $value;
+        }
+
+        $result = [];
+
+        foreach ($value as $key => $item) {
+            if (in_array(strtolower((string) $key), $sensitiveKeys, true)) {
+                $result[$key] = '[REDACTED]';
+                continue;
+            }
+
+            $result[$key] = $this->sanitizeSensitiveData($item);
+        }
+
+        return $result;
     }
 
     public function findByProviderPaymentId(
@@ -135,10 +169,10 @@ class PaymentService
             ':transaction_id' => $data['transaction_id'] ?? null,
             ':provider_reference' => $data['provider_reference'] ?? null,
             ':request_data' => isset($data['request_data'])
-                ? json_encode($data['request_data'], JSON_UNESCAPED_UNICODE)
+                ? json_encode($this->sanitizeSensitiveData($data['request_data']), JSON_UNESCAPED_UNICODE)
                 : null,
             ':response_data' => isset($data['response_data'])
-                ? json_encode($data['response_data'], JSON_UNESCAPED_UNICODE)
+                ? json_encode($this->sanitizeSensitiveData($data['response_data']), JSON_UNESCAPED_UNICODE)
                 : null,
             ':status' => $data['status'] ?? 'created'
         ]);

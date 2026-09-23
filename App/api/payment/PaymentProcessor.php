@@ -25,31 +25,77 @@ class PaymentProcessor
         int $customerId,
         string $provider = 'test'
     ): array {
-        $paymentId = $this->paymentService->create([
-            'order_id' => (int) $order['id'],
-            'cust_id' => $customerId,
-            'provider' => $provider,
-            'provider_order_id' => (string) $order['id'],
-            'amount' => $order['total'],
-            'currency' => $order['currency']
-        ]);
+        $paymentId = 0;
 
         try {
-            $gatewayResponse = $this->gateway->createPayment([
-                'payment_id' => $paymentId,
-                'order_id' => (int) $order['id'],
-                'amount' => $order['total'],
-                'currency' => $order['currency']
+            $this->pdo->beginTransaction();
+
+            /*
+             * Order səviyyəsində lock: eyni order üçün paralel payment
+             * yaradılmasının qarşısını alır.
+             */
+            $stmt = $this->pdo->prepare("
+                SELECT id, customer_id, total, currency, status
+                FROM orders
+                WHERE id = ? AND customer_id = ?
+                LIMIT 1
+                FOR UPDATE
+            ");
+            $stmt->execute([(int) $order['id'], $customerId]);
+            $lockedOrder = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$lockedOrder) {
+                throw new Exception('Order tapılmadı.');
+            }
+
+            if (!in_array($lockedOrder['status'], ['pending', 'failed'], true)) {
+                throw new Exception('Order artıq emaldadır.');
+            }
+
+            $existingPayment = $this->paymentService->findActiveByOrder(
+                (int) $lockedOrder['id']
+            );
+
+            if ($existingPayment) {
+                if ($existingPayment['status'] === 'paid') {
+                    throw new Exception('Order artıq ödənilib.');
+                }
+
+                throw new Exception('Bu order üçün artıq aktiv payment mövcuddur.');
+            }
+
+            $paymentId = $this->paymentService->create([
+                'order_id' => (int) $lockedOrder['id'],
+                'cust_id' => $customerId,
+                'provider' => $provider,
+                'provider_order_id' => (string) $lockedOrder['id'],
+                'amount' => $lockedOrder['total'],
+                'currency' => $lockedOrder['currency']
             ]);
 
-            if (!$gatewayResponse['success']) {
+            /*
+             * Gateway çağırışı qısa transaction daxilində saxlanılır ki,
+             * eyni order üçün ikinci payment yaradıla bilməsin.
+             */
+            $gatewayResponse = $this->gateway->createPayment([
+                'payment_id' => $paymentId,
+                'order_id' => (int) $lockedOrder['id'],
+                'amount' => $lockedOrder['total'],
+                'currency' => $lockedOrder['currency']
+            ]);
+
+            if (empty($gatewayResponse['success'])) {
                 throw new Exception('Gateway payment initialization failed.');
+            }
+
+            if (empty($gatewayResponse['provider_payment_id'])) {
+                throw new Exception('Provider payment ID is missing.');
             }
 
             $this->paymentService->updateGatewayData(
                 $paymentId,
-                $gatewayResponse['provider_payment_id'],
-                $gatewayResponse['raw_response']
+                (string) $gatewayResponse['provider_payment_id'],
+                (array) ($gatewayResponse['raw_response'] ?? [])
             );
 
             $transactionId = $this->paymentService->addTransaction([
@@ -57,22 +103,35 @@ class PaymentProcessor
                 'provider_reference' => $gatewayResponse['provider_payment_id'],
                 'status' => 'created',
                 'request_data' => [
-                    'order_id' => (int) $order['id'],
-                    'amount' => $order['total'],
-                    'currency' => $order['currency']
+                    'order_id' => (int) $lockedOrder['id'],
+                    'amount' => $lockedOrder['total'],
+                    'currency' => $lockedOrder['currency']
                 ],
-                'response_data' => $gatewayResponse['raw_response']
+                'response_data' => $gatewayResponse['raw_response'] ?? []
             ]);
+
+            $this->pdo->commit();
 
             return [
                 'payment_id' => $paymentId,
                 'transaction_id' => $transactionId,
-                'amount' => $order['total'],
-                'currency' => $order['currency'],
+                'amount' => $lockedOrder['total'],
+                'currency' => $lockedOrder['currency'],
                 'redirect_url' => $gatewayResponse['redirect_url']
             ];
         } catch (Throwable $e) {
-            $this->paymentService->updateStatus($paymentId, 'failed');
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            if ($paymentId > 0) {
+                try {
+                    $this->paymentService->updateStatus($paymentId, 'failed');
+                } catch (Throwable $ignored) {
+                    // Əsas xətanı gizlətmə.
+                }
+            }
+
             throw $e;
         }
     }
@@ -130,6 +189,49 @@ class PaymentProcessor
 
                 if ((int) $context['customer_id'] !== (int) $payment['cust_id']) {
                     throw new Exception('Payment customer mismatch.');
+                }
+
+                $localAmount = number_format((float) $payment['amount'], 2, '.', '');
+                $providerAmount = $result['amount'] ?? null;
+                $providerCurrency = $result['currency'] ?? null;
+
+                /*
+                 * Bəzi provider status cavablarında amount/currency ayrıca
+                 * gəlməyə bilər. Bu halda payment yaradılarkən saxlanmış,
+                 * redaktə edilməmiş biznes məlumatından yox, provider-in
+                 * ilkin response-dakı order məlumatından istifadə edirik.
+                 */
+                if ($providerAmount === null || $providerCurrency === null) {
+                    $storedResponse = json_decode(
+                        (string) ($payment['raw_response'] ?? ''),
+                        true
+                    );
+
+                    $storedOrder = is_array($storedResponse)
+                        ? ($storedResponse['order'] ?? [])
+                        : [];
+
+                    if ($providerAmount === null) {
+                        $providerAmount = $storedOrder['amount'] ?? null;
+                    }
+
+                    if ($providerCurrency === null) {
+                        $providerCurrency = $storedOrder['currency'] ?? null;
+                    }
+                }
+
+                if (
+                    $providerAmount === null
+                    || number_format((float) $providerAmount, 2, '.', '') !== $localAmount
+                ) {
+                    throw new Exception('Payment amount mismatch.');
+                }
+
+                $localCurrency = strtoupper((string) $payment['currency']);
+                $providerCurrency = strtoupper((string) $providerCurrency);
+
+                if ($providerCurrency === '' || $providerCurrency !== $localCurrency) {
+                    throw new Exception('Payment currency mismatch.');
                 }
 
                 $months = (int) $context['months'];

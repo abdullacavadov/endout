@@ -1,62 +1,45 @@
 <?php
 declare(strict_types=1);
 
+$base_url = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
 
-$base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
-
-
-/*
-|--------------------------------------------------------------------------
-| USER IP-ni və ölkə kodunu əldə et
-|--------------------------------------------------------------------------
-*/
-function get_client_ip()
+function env_value(string $key, ?string $default = null): ?string
 {
-
-    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-        return trim($ips[0]); // yalnız birinci IP
-    }
-
-    if (!empty($_SERVER['REMOTE_ADDR'])) {
-        return $_SERVER['REMOTE_ADDR'];
-    }
-
-    return null;
+    $value = getenv($key);
+    return $value === false ? $default : $value;
 }
 
+function env_bool(string $key, bool $default = false): bool
+{
+    $value = getenv($key);
+    if ($value === false) {
+        return $default;
+    }
 
-$user_ip = get_client_ip();
-
-if ($user_ip === '127.0.0.1' || $user_ip === '::1') {
-    $user_ip = '188.253.208.24'; // test
+    return filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $default;
 }
-
-$response = file_get_contents("http://ip-api.com/json/{$user_ip}");
-$data = json_decode($response, true);
-
-$user_country_code = $data['countryCode'] ?? null;
-
-
-
 
 /*
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 | SESSION HARDENING
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 */
 ini_set('session.use_strict_mode', '1');
 ini_set('session.cookie_httponly', '1');
 ini_set('session.cookie_samesite', 'Lax');
 
-if (!empty($_SERVER['HTTPS'])) {
+if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
     ini_set('session.cookie_secure', '1');
 }
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 /*
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 | SECURITY HEADERS
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 */
 header('X-Frame-Options: SAMEORIGIN');
 header('X-Content-Type-Options: nosniff');
@@ -64,61 +47,111 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
 header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
 
 /*
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
+| USER IP / COUNTRY
+|---------------------------------------------------------------------------
+| X-Forwarded-For yalnız tətbiq etibarlı reverse proxy arxasındadırsa
+| istifadə olunur. Əks halda client tərəfindən saxtalaşdırıla bilər.
+*/
+function get_client_ip(): ?string
+{
+    if (
+        env_bool('TRUST_PROXY', false)
+        && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])
+    ) {
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+
+        foreach ($ips as $ip) {
+            $ip = trim($ip);
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                return $ip;
+            }
+        }
+    }
+
+    $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+
+    return is_string($ip) && filter_var($ip, FILTER_VALIDATE_IP)
+        ? $ip
+        : null;
+}
+
+$user_ip = get_client_ip();
+$user_country_code = $_SESSION['_country_code'] ?? null;
+
+if (
+    $user_country_code === null
+    && $user_ip !== null
+    && filter_var($user_ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)
+) {
+    $geoUrl = 'https://ip-api.com/json/' . rawurlencode($user_ip) . '?fields=status,countryCode';
+
+    $context = stream_context_create([
+        'http' => [
+            'timeout' => 2,
+            'ignore_errors' => true,
+        ],
+    ]);
+
+    $response = @file_get_contents($geoUrl, false, $context);
+    $data = is_string($response) ? json_decode($response, true) : null;
+
+    $user_country_code = is_array($data) && ($data['status'] ?? '') === 'success'
+        ? ($data['countryCode'] ?? null)
+        : null;
+
+    $_SESSION['_country_code'] = $user_country_code;
+}
+
+/*
+|---------------------------------------------------------------------------
 | LOAD CORE FILES
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 */
 require_once __DIR__ . '/../api/_db.php';
 require_once __DIR__ . '/../api/_guards.php';
 require_once __DIR__ . '/../api/_csrf.php';
 require_once __DIR__ . '/../api/_helpers.php';
 
-
-/*
-|--------------------------------------------------------------------------
-| START SESSION
-|--------------------------------------------------------------------------
-*/
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 if (!isset($pdo) || !($pdo instanceof PDO)) {
-  json_out(['ok' => false, 'error' => 'DB bağlantısı tapılmadı. (_db.php)'], 500);
+    json_out(['ok' => false, 'error' => 'DB bağlantısı tapılmadı.'], 500);
 }
-
-
-
-///////////////////////////////////////////////////////////////////////////////////
 
 define('BASE_URL', $base_url);
 
-// Test/Prod mode
-define('APP_ENV', 'local'); // prod-da 'prod'
-define('SHOW_OTP_ON_FRONT', true); // prod-da false et
+define('APP_ENV', env_value('APP_ENV', 'prod'));
+define('SHOW_OTP_ON_FRONT', env_bool('SHOW_OTP_ON_FRONT', false));
 
-//Google Captcha
-define('SECRET_KEY', '6LeOX5osAAAAAPcUgr9zb1xBdTRkYHjBGnVMIhgi');
-define('SITE_KEY', '6LeOX5osAAAAAPcUgr9zb1xBdTRkYHjBGnVMIhgi');
+/*
+|---------------------------------------------------------------------------
+| GOOGLE reCAPTCHA
+|---------------------------------------------------------------------------
+*/
+define('SECRET_KEY', env_value('RECAPTCHA_SECRET_KEY', ''));
+define('SITE_KEY', env_value('RECAPTCHA_SITE_KEY', ''));
 
+/*
+|---------------------------------------------------------------------------
+| SMTP
+|---------------------------------------------------------------------------
+*/
+define('SMTP_HOST', env_value('SMTP_HOST', ''));
+define('SMTP_PORT', (int) env_value('SMTP_PORT', '465'));
+define('SMTP_USER', env_value('SMTP_USER', ''));
+define('SMTP_PASS', env_value('SMTP_PASS', ''));
+define('SMTP_FROM_EMAIL', env_value('SMTP_FROM_EMAIL', ''));
+define('SMTP_FROM_NAME', env_value('SMTP_FROM_NAME', 'EndOut Support'));
+define('SMTP_SECURE', env_value('SMTP_SECURE', 'ssl'));
 
-// SMTP SETTINGS (PHPMailer)
-define('SMTP_HOST', 'mail.ofismall.az');
-define('SMTP_PORT', 465);
-define('SMTP_USER', 'a.javadov@ofismall.az');     // tam email
-define('SMTP_PASS', 'Graf1993a'); // webmail hesabının şifrəsi
-define('SMTP_FROM_EMAIL', 'a.javadov@ofismall.az');
-define('SMTP_FROM_NAME', 'EndOut Support');
-define('SMTP_SECURE', 'ssl'); // 465 üçün
-
-
-
-// SMS OTP
-define('PG_API_URL', 'api.poctgoyercini.com');
-define('PG_PUBLIC_KEY', 'e6a2adb3268348b1');
-define('PG_PRIVATE_KEY', 'eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiSldUIiwiY3R5IjoiSldUIn0.A4J2rnJIYf0NCdbsKyTbOdbl3bJFPp-jrXq3IfY_dkKJZVFYOucUOlapVbLYL8_ykQv-zFsJysLAr0Wdwt9IFu2Rba3DGWiV.Kez6_oSK1lH2bU6kY2hAoA.5OMCJjmt99Hj21DEUTSI_Ubycdu-cbnq-xs-OROEY4m3g3A6uGjVqeCLEtq3wctWNl4_5RIRzenM0EtiJejt71VX29o4WX8pjYB5_tWUBhHKTOh4_CkPNaN7exRSR0YvzeJiCkdoTI32OX4mN3pdD8mxqwp-Pk4UQymqfuzXbktxUQXgY4QpbdpwGN6Hmo-eeE_QdxdNggjhj3ueadizDxjuGegHX42dR6gzBZWjnnSjtL6u1nf2tb-ztnfQdKPQYSpNLAlCZqhKWRB__LwSUCwC8K0loxis_W6-HOkk4bum70VwzlCeYMA2gLMpfqZQL8zwvKKIr0HgdoD2ykL68Hq0Ux6n2gdKZdSr7VAiU_L5NswrenmpMfBmxDRtCgez49EBryCppPUxSPANt7nZpsad3B1TDv07vwEyQbe_gWLE4F1SnxhvtT0WPvnf6iGF_H2sjQ_k1X6vOe8jTKpujg.AJsYfDeeSgQqLMuv_BDeMEbcR1JZyBs5KLMVKGyPgK0');
-define('PG_SMS_ENCODING', 'LATIN');
-define('PG_SMS_REPORT_LABEL', 'endout-otp');
-define('PG_SMS_PURPOSE', 'INF');
-define('PG_SMS_ORIGINATOR', 'EndOut');
-
+/*
+|---------------------------------------------------------------------------
+| SMS OTP
+|---------------------------------------------------------------------------
+*/
+define('PG_API_URL', env_value('PG_API_URL', ''));
+define('PG_PUBLIC_KEY', env_value('PG_PUBLIC_KEY', ''));
+define('PG_PRIVATE_KEY', env_value('PG_PRIVATE_KEY', ''));
+define('PG_SMS_ENCODING', env_value('PG_SMS_ENCODING', 'LATIN'));
+define('PG_SMS_REPORT_LABEL', env_value('PG_SMS_REPORT_LABEL', 'endout-otp'));
+define('PG_SMS_PURPOSE', env_value('PG_SMS_PURPOSE', 'INF'));
+define('PG_SMS_ORIGINATOR', env_value('PG_SMS_ORIGINATOR', 'EndOut'));

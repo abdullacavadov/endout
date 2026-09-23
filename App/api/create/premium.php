@@ -1,164 +1,115 @@
 <?php
+declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . "/../../inc/config.php";
 require_once __DIR__ . "/../_helpers.php";
 
-csrf_verify($_POST['csrf_token'] ?? null ?? null);
+require_login_api($pdo);
+csrf_verify($_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null));
 
-if (!isset($_SESSION['customer_id'])) {
-    http_response_code(401);
-    exit(json_encode([
-        'ok' => false,
-        'error' => 'Unauthorized'
-    ]));
-}
+$customerId = (int) $_SESSION['customer_id'];
+$listingId = (int) ($_POST['listing_id'] ?? 0);
+$planId = (int) ($_POST['plan_id'] ?? 0);
 
-$customer_id = $_SESSION['customer_id'];
-
-$listing_id = (int) ($_POST['listing_id'] ?? 0);
-$plan_id = (int) ($_POST['plan_id'] ?? 0);
-
-if (!$listing_id || !$plan_id) {
-    exit(json_encode([
-        'ok' => false,
-        'error' => 'Missing data'
-    ]));
+if ($listingId <= 0 || $planId <= 0) {
+    json_out(['ok' => false, 'error' => 'Missing data'], 422);
 }
 
 try {
-
     $pdo->beginTransaction();
 
-    /*
-    -----------------------------------
-    Elanı yoxla
-    -----------------------------------
-    */
-
     $stmt = $pdo->prepare("
-        SELECT id,title
+        SELECT id, title, status
         FROM listings
         WHERE id = ? AND customer_id = ?
         LIMIT 1
+        FOR UPDATE
     ");
-
-    $stmt->execute([$listing_id, $customer_id]);
-    $listing = $stmt->fetch();
+    $stmt->execute([$listingId, $customerId]);
+    $listing = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$listing) {
-        throw new Exception('Elan tapılmadı');
+        throw new RuntimeException('Elan tapılmadı.');
     }
 
-    /*
-    -----------------------------------
-    Planı yoxla
-    -----------------------------------
-    */
+    if ($listing['status'] !== 'active') {
+        throw new RuntimeException('Yalnız aktiv elan premium edilə bilər.');
+    }
 
     $stmt = $pdo->prepare("
-        SELECT id,duration_days,price
+        SELECT id, duration_days, price
         FROM premium_plans
         WHERE id = ? AND status = 1
         LIMIT 1
     ");
-
-    $stmt->execute([$plan_id]);
-    $plan = $stmt->fetch();
+    $stmt->execute([$planId]);
+    $plan = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$plan) {
-        throw new Exception('Plan tapılmadı');
+        throw new RuntimeException('Plan tapılmadı.');
     }
 
-
     /*
-    -----------------------------------
-    Elanın aktivliyini yoxla
-    -----------------------------------
-    */
-
-    $stmt = $pdo->prepare("
-        SELECT status
-        FROM listings
-        WHERE status != ?
-        LIMIT 1
-    ");
-
-    $stmt->execute(['active']);
-
-    if ($stmt->fetch()) {
-        throw new Exception('Aktiv olmayan elanı premium edə bilməzsiniz.');
+     * Premium üçün ayrıca ödəniş/order axını olmadıqca ödənişli planın
+     * bu endpoint-dən birbaşa aktivləşdirilməsi qadağandır.
+     * Pulsuz planlar isə normal şəkildə aktivləşdirilə bilər.
+     */
+    if ((float) $plan['price'] > 0) {
+        throw new RuntimeException(
+            'Ödənişli premium plan payment axını ilə aktivləşdirilməlidir.'
+        );
     }
-    
-
-    /*
-    -----------------------------------
-    Aktiv premium varmı
-    -----------------------------------
-    */
 
     $stmt = $pdo->prepare("
         SELECT id
         FROM premium_listings
         WHERE listing_id = ?
-        AND expires_at > NOW()
+          AND expires_at > NOW()
         LIMIT 1
+        FOR UPDATE
     ");
-
-    $stmt->execute([$listing_id]);
+    $stmt->execute([$listingId]);
 
     if ($stmt->fetch()) {
-        throw new Exception('Bu elan artıq premiumdur. Premium müddəti bitdikdən sonra yenidən elanı premium edə bilərsiniz.');
+        throw new RuntimeException('Bu elan artıq premiumdur.');
     }
-
-
-
-    
-
-
-    /*
-    -----------------------------------
-    Premium əlavə et
-    -----------------------------------
-    */
 
     $stmt = $pdo->prepare("
         INSERT INTO premium_listings
-        (listing_id,plan_id,started_at,expires_at)
+            (listing_id, plan_id, started_at, expires_at)
         VALUES
-        (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL ? DAY))
+            (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL ? DAY))
     ");
-
     $stmt->execute([
-        $listing_id,
-        $plan['id'],
-        $plan['duration_days']
+        $listingId,
+        (int) $plan['id'],
+        (int) $plan['duration_days']
     ]);
 
     $pdo->commit();
 
-    echo json_encode([
+    json_out([
         'ok' => true,
         'message' => 'Elan uğurla premium edildi',
         'listing' => [
-            'id' => $listing['id'],
+            'id' => (int) $listing['id'],
             'title' => $listing['title']
         ],
         'premium' => [
-            'duration_days' => $plan['duration_days'],
-            'price' => $plan['price']
+            'duration_days' => (int) $plan['duration_days'],
+            'price' => (float) $plan['price']
         ]
     ]);
+} catch (Throwable $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
 
-} catch (Exception $e) {
-
-    $pdo->rollBack();
-
-    http_response_code(400);
-
-    echo json_encode([
+    error_log('premium activation failed: ' . $e->getMessage());
+    json_out([
         'ok' => false,
         'error' => $e->getMessage()
-    ]);
+    ], 400);
 }

@@ -1,8 +1,23 @@
 <?php
-error_reporting(E_ALL);
+declare(strict_types=1);
 
 ob_start();
-session_start();
+
+ini_set('session.use_strict_mode', '1');
+ini_set('session.cookie_httponly', '1');
+ini_set('session.cookie_samesite', 'Lax');
+
+if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+    ini_set('session.cookie_secure', '1');
+}
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+header('X-Frame-Options: SAMEORIGIN');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: strict-origin-when-cross-origin');
 
 require_once("db.php");
 
@@ -47,8 +62,9 @@ define('CONFIRM_DELETE_KEY', $confirm_code);
 define('GOOGLE_CLIENT_ID', $google_client_id);
 define('GOOGLE_CLIENT_SECRET', $google_client_secret);
 
-// Error Reporting Turn On
-ini_set('error_reporting', E_ALL);
+// Production: detallı xətalar server loguna gedir, browser-ə çıxmır.
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 
 // Setting up the time zone
 date_default_timezone_set($time_zone);

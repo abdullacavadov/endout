@@ -1,334 +1,284 @@
 <?php
+declare(strict_types=1);
+
+header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . "/../../inc/config.php";
 
-header("Content-Type: application/json");
+require_login_api($pdo);
+csrf_verify($_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null));
 
-if (!isset($_SESSION['customer_id'])) {
-    echo json_encode(["error" => "Unauthorized"]);
-    exit;
-}
-
-$customer_id = $_SESSION['customer_id'];
-
+$customerId = (int) $_SESSION['customer_id'];
 $lid = (int) ($_POST['lid'] ?? 0);
 
-if (!$lid) {
-    echo json_encode(["error" => "Listing ID boşdur"]);
-    exit;
+if ($lid <= 0) {
+    json_out(['ok' => false, 'error' => 'Listing ID boşdur'], 422);
 }
 
-$title = trim($_POST['title'] ?? '');
-$desc = trim($_POST['description'] ?? '');
+$title = trim((string) ($_POST['title'] ?? ''));
+$desc = trim((string) ($_POST['description'] ?? ''));
 $price = (float) ($_POST['price'] ?? 0);
-$old_price = (float) ($_POST['old_price'] ?? 0);
-$currency = trim($_POST['currency'] ?? '');
-$listing_type = (int) ($_POST['listing_type'] ?? 0);
-$sale_mode_id = (int) ($_POST['sale_mode_id'] ?? 0);
-
-$category_id = (int) ($_POST['sub_category'] ?? 0);
-
-$status = trim($_POST['status'] ?? '');
-
+$oldPrice = (float) ($_POST['old_price'] ?? 0);
+$currency = trim((string) ($_POST['currency'] ?? ''));
+$listingType = (int) ($_POST['listing_type'] ?? 0);
+$saleModeId = (int) ($_POST['sale_mode_id'] ?? 0);
+$categoryId = (int) ($_POST['sub_category'] ?? 0);
 $countries = $_POST['countries'] ?? [];
 
-
-if ($listing_type === 3) {
-    $old_price = 0.00;
+if ($listingType === 3) {
+    $oldPrice = 0.00;
 }
 
-if (!$title || !$listing_type || !$sale_mode_id || !$category_id || !$price || !$desc || !$currency) {
-    exit(json_encode(['error' => 'Bütün seçimləri doldurun']));
+if ($title === '' || $listingType <= 0 || $saleModeId <= 0 || $categoryId <= 0 || $price <= 0 || $desc === '' || $currency === '') {
+    json_out(['ok' => false, 'error' => 'Bütün seçimləri doldurun'], 422);
 }
 
-if (($listing_type == 1 || $listing_type == 2) && !$old_price) {
-    exit(json_encode(['error' => 'Köhnə qiymət daxil edilməyib']));
+if (($listingType === 1 || $listingType === 2) && $oldPrice <= 0) {
+    json_out(['ok' => false, 'error' => 'Köhnə qiymət daxil edilməyib'], 422);
 }
 
-if ($listing_type == 2 && $sale_mode_id == 1) {
-    exit(json_encode(['error' => 'Outlet elanlarında yalnız "Pərakəndə" satış rejimi seçilə bilər']));
+if ($listingType === 2 && $saleModeId === 1) {
+    json_out(['ok' => false, 'error' => 'Outlet elanlarında yalnız "Pərakəndə" satış rejimi seçilə bilər'], 422);
 }
 
-if (($listing_type == 1 || $listing_type == 2) && $old_price <= $price) {
-    exit(json_encode(['error' => 'Köhnə qiymət hazırkı qiymətdən çox olmalıdır']));
+if (($listingType === 1 || $listingType === 2) && $oldPrice <= $price) {
+    json_out(['ok' => false, 'error' => 'Köhnə qiymət hazırkı qiymətdən çox olmalıdır'], 422);
+}
+
+if (empty($countries) || !is_array($countries)) {
+    json_out(['ok' => false, 'error' => 'Ölkə seçilməyib'], 422);
 }
 
 $hasImage = false;
-
-if (isset($_FILES['images']) && is_array($_FILES['images']['tmp_name'])) {
+if (isset($_FILES['images']['tmp_name']) && is_array($_FILES['images']['tmp_name'])) {
     foreach ($_FILES['images']['tmp_name'] as $i => $tmp) {
-        if (!empty($tmp) && $_FILES['images']['error'][$i] === 0) {
+        if (!empty($tmp) && ($_FILES['images']['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
             $hasImage = true;
             break;
         }
     }
 }
 
-/*
-Əgər mövcud şəkil də yoxdursa və yeni də yoxdursa → ERROR
-*/
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM listing_images WHERE listing_id=?");
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM listing_images WHERE listing_id = ?");
 $stmt->execute([$lid]);
-$existingCount = $stmt->fetchColumn();
+$existingCount = (int) $stmt->fetchColumn();
 
-if (!$hasImage && $existingCount == 0) {
-    echo json_encode(["error" => "Ən azı 1 şəkil əlavə edilməlidir."]);
-    exit;
-}
-
-if (empty($countries) || !is_array($countries)) {
-    echo json_encode(["error" => "Ölkə seçilməyib"]);
-    exit;
+if (!$hasImage && $existingCount === 0) {
+    json_out(['ok' => false, 'error' => 'Ən azı 1 şəkil əlavə edilməlidir.'], 422);
 }
 
 try {
-
     $pdo->beginTransaction();
-
-    /* listing yoxla */
 
     $stmt = $pdo->prepare("
         SELECT id
         FROM listings
-        WHERE id=? AND customer_id=?
+        WHERE id = ? AND customer_id = ?
         LIMIT 1
+        FOR UPDATE
     ");
-
-    $stmt->execute([$lid, $customer_id]);
+    $stmt->execute([$lid, $customerId]);
 
     if (!$stmt->fetch()) {
-        throw new Exception("Listing tapılmadı");
+        throw new RuntimeException('Listing tapılmadı');
     }
 
-    /* update listing */
-
+    /*
+     * Moderasiya/status state-i client tərəfindən dəyişdirilə bilməz.
+     * Elan redaktə edildikdə mövcud status qorunur.
+     */
     $stmt = $pdo->prepare("
         UPDATE listings
         SET
-        title=?,
-        description=?,
-        price=?,
-        old_price=?,
-        currency=?,
-        category_id=?,
-        type_id=?,
-        sale_mode_id=?,
-        status=?
-        WHERE id=? AND customer_id=?
+            title = ?,
+            description = ?,
+            price = ?,
+            old_price = ?,
+            currency = ?,
+            category_id = ?,
+            type_id = ?,
+            sale_mode_id = ?
+        WHERE id = ? AND customer_id = ?
     ");
-
     $stmt->execute([
         $title,
         $desc,
         $price,
-        $old_price,
+        $oldPrice,
         $currency,
-        $category_id,
-        $listing_type,
-        $sale_mode_id,
-        $status,
+        $categoryId,
+        $listingType,
+        $saleModeId,
         $lid,
-        $customer_id
+        $customerId
     ]);
 
-    /* countries reset */
-
-    $pdo->prepare("DELETE FROM listing_countries WHERE listing_id=?")
+    $pdo->prepare("DELETE FROM listing_countries WHERE listing_id = ?")
         ->execute([$lid]);
 
-    if ($countries) {
+    $countryStmt = $pdo->prepare("
+        INSERT INTO listing_countries (listing_id, country_id)
+        VALUES (?, ?)
+    ");
 
-        $stmt = $pdo->prepare("
-            INSERT INTO listing_countries
-            (listing_id,country_id)
-            VALUES (?,?)
-        ");
-
-        foreach ($countries as $cid) {
-            $stmt->execute([$lid, (int) $cid]);
+    foreach ($countries as $countryId) {
+        $countryId = (int) $countryId;
+        if ($countryId > 0) {
+            $countryStmt->execute([$lid, $countryId]);
         }
     }
 
-    /* =========================
-       VIDEO UPDATE
-    ========================= */
-
     if (!empty($_FILES['video_path']['name'])) {
-
-        if ($_FILES['video_path']['size'] > 30 * 1024 * 1024) {
-            throw new Exception("Video maksimum 30MB ola bilər");
+        if (($_FILES['video_path']['size'] ?? 0) > 30 * 1024 * 1024) {
+            throw new RuntimeException("Video maksimum 30MB ola bilər");
         }
-
-        $allowed = ['video/mp4', 'video/webm', 'video/quicktime'];
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime = finfo_file($finfo, $_FILES['video_path']['tmp_name']);
+        finfo_close($finfo);
 
-        if (!in_array($mime, $allowed)) {
-            throw new Exception("Yalnız MP4 və WEBM video icazəlidir");
+        $videoExt = [
+            'video/mp4' => 'mp4',
+            'video/webm' => 'webm',
+            'video/quicktime' => 'mov',
+        ];
+
+        if (!isset($videoExt[$mime])) {
+            throw new RuntimeException("Yalnız MP4, WEBM və MOV video icazəlidir");
         }
 
         $stmt = $pdo->prepare("
             SELECT id, video_path
             FROM listing_videos
-            WHERE listing_id=?
+            WHERE listing_id = ?
             LIMIT 1
+            FOR UPDATE
         ");
-
         $stmt->execute([$lid]);
         $oldVideo = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        /* köhnə video sil */
-
-        if ($oldVideo) {
-
-            $oldFile = "../../assets/video/uploads/listings/" . $oldVideo['video_path'];
-
-            if (file_exists($oldFile)) {
-                unlink($oldFile);
-            }
-
-            $pdo->prepare("DELETE FROM listing_videos WHERE id=?")
-                ->execute([$oldVideo['id']]);
+        $videoDir = __DIR__ . "/../../assets/video/uploads/listings/";
+        if (!is_dir($videoDir) && !mkdir($videoDir, 0775, true) && !is_dir($videoDir)) {
+            throw new RuntimeException('Video qovluğu yaradıla bilmədi.');
         }
 
-        /* yeni video upload */
+        if ($oldVideo) {
+            $oldFile = $videoDir . basename((string) $oldVideo['video_path']);
+            if (is_file($oldFile)) {
+                @unlink($oldFile);
+            }
 
-        $ext = pathinfo($_FILES['video_path']['name'], PATHINFO_EXTENSION);
+            $pdo->prepare("DELETE FROM listing_videos WHERE id = ?")
+                ->execute([(int) $oldVideo['id']]);
+        }
 
-        $fileName = uniqid() . "." . $ext;
+        $fileName = bin2hex(random_bytes(16)) . '.' . $videoExt[$mime];
 
-        move_uploaded_file(
-            $_FILES['video_path']['tmp_name'],
-            "../../assets/video/uploads/listings/" . $fileName
-        );
+        if (!move_uploaded_file($_FILES['video_path']['tmp_name'], $videoDir . $fileName)) {
+            throw new RuntimeException('Video yüklənə bilmədi.');
+        }
 
         $stmt = $pdo->prepare("
-            INSERT INTO listing_videos
-            (listing_id,video_path)
-            VALUES (?,?)
+            INSERT INTO listing_videos (listing_id, video_path)
+            VALUES (?, ?)
         ");
-
         $stmt->execute([$lid, $fileName]);
     }
 
-    /* =========================
-       IMAGE UPLOAD
-    ========================= */
+    $uploadDir = __DIR__ . "/../../assets/img/uploads/listings/";
 
-    /* =========================
-   IMAGE SYNC (SORTABLE)
-========================= */
-
-    $uploadDir = "../../assets/img/uploads/listings/";
-
-    if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+        throw new RuntimeException('Şəkil qovluğu yaradıla bilmədi.');
     }
 
-    $allowed = ['image/jpeg', 'image/png', 'image/webp'];
-
     $existingImages = $_POST['existing_images'] ?? [];
+    $existingImages = is_array($existingImages) ? $existingImages : [];
 
-    /* köhnə şəkilləri götür */
     $stmt = $pdo->prepare("
-    SELECT id, image_path
-    FROM listing_images
-    WHERE listing_id=?
-");
+        SELECT id, image_path
+        FROM listing_images
+        WHERE listing_id = ?
+        FOR UPDATE
+    ");
     $stmt->execute([$lid]);
     $oldImages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    /* map */
     $oldMap = [];
     foreach ($oldImages as $img) {
-        $oldMap[$img['id']] = $img['image_path'];
+        $oldMap[(int) $img['id']] = (string) $img['image_path'];
     }
 
-    /* HAMISINI SİL */
-    $pdo->prepare("DELETE FROM listing_images WHERE listing_id=?")
+    $pdo->prepare("DELETE FROM listing_images WHERE listing_id = ?")
         ->execute([$lid]);
 
     $order = 1;
-
-    /* =========================
-       1. EXISTING (sıra ilə)
-    ========================= */
-
-    foreach ($existingImages as $imgId) {
-
-        if (!isset($oldMap[$imgId]))
-            continue;
-
-        $stmt = $pdo->prepare("
-        INSERT INTO listing_images
-        (listing_id,image_path,sort_order)
-        VALUES (?,?,?)
+    $imageInsert = $pdo->prepare("
+        INSERT INTO listing_images (listing_id, image_path, sort_order)
+        VALUES (?, ?, ?)
     ");
 
-        $stmt->execute([
-            $lid,
-            $oldMap[$imgId],
-            $order++
-        ]);
+    foreach ($existingImages as $imgId) {
+        $imgId = (int) $imgId;
 
+        if (!isset($oldMap[$imgId])) {
+            continue;
+        }
+
+        $imageInsert->execute([$lid, basename($oldMap[$imgId]), $order++]);
         unset($oldMap[$imgId]);
     }
 
-    /* =========================
-       2. NEW IMAGES (sıra ilə)
-    ========================= */
+    $allowedImageMimes = ['image/jpeg', 'image/png', 'image/webp'];
 
-    if (isset($_FILES['images'])) {
-
+    if (isset($_FILES['images']['tmp_name']) && is_array($_FILES['images']['tmp_name'])) {
         foreach ($_FILES['images']['tmp_name'] as $i => $tmp) {
-
-            if (empty($tmp) || $_FILES['images']['error'][$i] !== 0)
+            if (
+                empty($tmp)
+                || ($_FILES['images']['error'][$i] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK
+            ) {
                 continue;
+            }
 
-            $mime = mime_content_type($tmp);
-            if (!in_array($mime, $allowed))
-                continue;
+            if (($_FILES['images']['size'][$i] ?? 0) > 8 * 1024 * 1024) {
+                throw new RuntimeException('Şəkil maksimum 8MB ola bilər.');
+            }
 
-            $fileName = uniqid() . ".webp";
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $tmp);
+            finfo_close($finfo);
 
-            move_uploaded_file($tmp, $uploadDir . $fileName);
+            if (!in_array($mime, $allowedImageMimes, true)) {
+                throw new RuntimeException('Yalnız JPEG, PNG və WEBP şəkillər icazəlidir.');
+            }
 
-            $stmt = $pdo->prepare("
-            INSERT INTO listing_images
-            (listing_id,image_path,sort_order)
-            VALUES (?,?,?)
-        ");
+            $fileName = bin2hex(random_bytes(16)) . '.webp';
+            make_webp($tmp, $uploadDir . $fileName, 82);
 
-            $stmt->execute([
-                $lid,
-                $fileName,
-                $order++
-            ]);
+            $imageInsert->execute([$lid, $fileName, $order++]);
         }
     }
 
-    /* =========================
-       3. İSTİFADƏ OLUNMAYAN KÖHNƏ FAYLLARI SİL
-    ========================= */
-
     foreach ($oldMap as $unused) {
-        $file = $uploadDir . $unused;
-        if (file_exists($file))
-            unlink($file);
+        $file = $uploadDir . basename($unused);
+        if (is_file($file)) {
+            @unlink($file);
+        }
     }
 
     $pdo->commit();
 
-    echo json_encode([
-        'success' => true
-    ]);
+    json_out(['ok' => true, 'success' => true]);
+} catch (Throwable $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
 
-} catch (Exception $e) {
+    error_log('listing update failed: ' . $e->getMessage());
 
-    $pdo->rollBack();
-
-    echo json_encode([
-        "error" => $e->getMessage()
-    ]);
+    json_out([
+        'ok' => false,
+        'error' => $e instanceof RuntimeException
+            ? $e->getMessage()
+            : 'Elan yenilənərkən xəta baş verdi.'
+    ], 400);
 }

@@ -74,6 +74,7 @@ if (isset($_POST['login'])) {
             $error_message .= 'Şifrə uyğun gəlmir<br>';
         } else {
             // Daxil edilən məlumatlar düzgündür, sessiyaya məlumatı yazırıq və yönləndiririk
+            session_regenerate_id(true);
             $_SESSION['user'] = $row;
             header("Location: index.php");
             exit();
