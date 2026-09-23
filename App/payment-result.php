@@ -124,17 +124,31 @@ $message = $isSuccess
                             </div>
                             <div>
                                 <b>Abunəlik bitir:</b>
-                                <?= htmlspecialchars($payment['ends_at'] ?? '') ?>
+                                <?= htmlspecialchars(
+                                    $payment['ends_at']
+                                        ? strtolower(date('d M Y | H:i', strtotime($payment['ends_at'])))
+                                        : ''
+                                ) ?>
                             </div>
                         <?php endif; ?>
                     </div>
 
-                    <a
-                        href="<?= htmlspecialchars($base_url) ?>/payment.php"
-                        class="btn btn-primary mt-4"
-                    >
-                        Ödəniş səhifəsinə qayıt
-                    </a>
+                    <?php if ($isFailed) : ?>
+                      
+                        <a
+                            href="<?= htmlspecialchars($base_url) ?>/payment.php"
+                            class="btn btn-primary mt-4"
+                        >
+                            Ödəniş səhifəsinə qayıt
+                        </a>
+                    <?php else : ?>
+                        <a
+                            href="<?= htmlspecialchars($base_url) ?>/dashboard.php"
+                            class="btn btn-primary mt-4"
+                        >
+                            İdəretmə panelinə keç
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
