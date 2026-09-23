@@ -1,4 +1,4 @@
-<?php include("inc/config.php"); ?>
+<?php require_once("inc/config.php"); require_once("inc/admin_auth.php"); require_admin_permission($pdo, "staff"); $admin_csrf = admin_csrf_token(); ?>
 
 <?php
 
@@ -42,7 +42,7 @@ $permission = $stmt->fetch();
             <div class="app-content-wrapper py-20 pb-13">
                 <div class="container ">
 
-                    <form id="permissions_add">
+                    <form id="permissions_add"><input type="hidden" name="csrf" value="<?= admin_h($admin_csrf) ?>">
 
                         <div class="page-header pb-7 d-flex justify-content-between align-items-center gap-6 flex-wrap">
                             <div class="">

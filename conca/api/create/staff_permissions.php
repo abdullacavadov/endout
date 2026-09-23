@@ -1,48 +1,7 @@
 <?php
-
-require_once("../../inc/config.php");
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    exit('Sorğu metodu yanlışdır.');
-}
-
-$name = trim($_POST['permissions_name'] ?? '');
-$permission = trim($_POST['permission'] ?? '');
-
-if (empty($name)) {
-    exit('Zəhmət olmasa, icazə adını doldurun.');
-}
-
-if (empty($permission)) {
-    exit('Zəhmət olmasa, icazə sahəsini doldurun.');
-}
-
-try {
-
-    // Duplicate yoxlaması
-    $check = $pdo->prepare("SELECT id FROM tbl_permissions WHERE permission = ?");
-    $check->execute([$permission]);
-
-    if ($check->rowCount() > 0) {
-        exit('Bu icazə artıq mövcuddur.');
-    }
-
-    // Insert
-    $statement = $pdo->prepare("
-        INSERT INTO tbl_permissions (name, permission)
-        VALUES (?, ?)
-    ");
-
-    $statement->execute([$name, $permission]);
-
-    echo 'success';
-
-} catch (PDOException $e) {
-
-    // Productionda bunu istifadəçiyə göstərmə
-    echo 'Server xətası baş verdi.';
-
-    // Debug üçün:
-    echo $e->getMessage();
-
-}
+declare(strict_types=1);
+require_once("../../inc/config.php");require_once("../../inc/admin_auth.php");require_admin_permission($pdo,'staff');
+if($_SERVER['REQUEST_METHOD']!=='POST')exit('Sorğu metodu yanlışdır.');admin_verify_csrf($_POST['csrf']??null);
+$name=trim((string)($_POST['permissions_name']??''));$permission=trim((string)($_POST['permission']??''));if($name===''||$permission==='')exit('Bütün sahələri doldurun.');if(!preg_match('/^[a-z][a-z0-9_.-]{1,80}$/',$permission))exit('Permission formatı yanlışdır.');
+$st=$pdo->prepare("SELECT id FROM tbl_permissions WHERE permission=? LIMIT 1");$st->execute([$permission]);if($st->fetch())exit('Bu icazə artıq mövcuddur.');
+$st=$pdo->prepare("INSERT INTO tbl_permissions(name,permission) VALUES(?,?)");$st->execute([$name,$permission]);$id=(int)$pdo->lastInsertId();admin_audit($pdo,'permission.created','permission',$id,null,['name'=>$name,'permission'=>$permission]);echo 'success';

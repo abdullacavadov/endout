@@ -1,4 +1,4 @@
-<?php include("inc/config.php"); ?>
+<?php require_once("inc/config.php"); require_once("inc/admin_auth.php"); require_admin_permission($pdo, "staff"); $admin_csrf = admin_csrf_token(); ?>
 
 <?php
 if (!isset($_GET['rid']) || empty($_GET['rid'])) {
@@ -49,7 +49,7 @@ $selected_permissions = array_map(
             <div class="app-content-wrapper py-20 pb-13">
                 <div class="container ">
 
-                    <form id="roles_edit">
+                    <form id="roles_edit"><input type="hidden" name="csrf" value="<?= admin_h($admin_csrf) ?>">
 
                     <input type="hidden" name="role_id" value="<?= $role['role_id']; ?>">
 
