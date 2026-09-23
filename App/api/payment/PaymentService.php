@@ -169,10 +169,10 @@ class PaymentService
             ':transaction_id' => $data['transaction_id'] ?? null,
             ':provider_reference' => $data['provider_reference'] ?? null,
             ':request_data' => isset($data['request_data'])
-                ? json_encode($data['request_data'], JSON_UNESCAPED_UNICODE)
+                ? json_encode($this->sanitizeSensitiveData($data['request_data']), JSON_UNESCAPED_UNICODE)
                 : null,
             ':response_data' => isset($data['response_data'])
-                ? json_encode($data['response_data'], JSON_UNESCAPED_UNICODE)
+                ? json_encode($this->sanitizeSensitiveData($data['response_data']), JSON_UNESCAPED_UNICODE)
                 : null,
             ':status' => $data['status'] ?? 'created'
         ]);
