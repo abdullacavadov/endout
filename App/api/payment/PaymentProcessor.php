@@ -193,13 +193,42 @@ class PaymentProcessor
 
                 $localAmount = number_format((float) $payment['amount'], 2, '.', '');
                 $providerAmount = $result['amount'] ?? null;
+                $providerCurrency = $result['currency'] ?? null;
 
-                if ($providerAmount === null || number_format((float) $providerAmount, 2, '.', '') !== $localAmount) {
+                /*
+                 * Bəzi provider status cavablarında amount/currency ayrıca
+                 * gəlməyə bilər. Bu halda payment yaradılarkən saxlanmış,
+                 * redaktə edilməmiş biznes məlumatından yox, provider-in
+                 * ilkin response-dakı order məlumatından istifadə edirik.
+                 */
+                if ($providerAmount === null || $providerCurrency === null) {
+                    $storedResponse = json_decode(
+                        (string) ($payment['raw_response'] ?? ''),
+                        true
+                    );
+
+                    $storedOrder = is_array($storedResponse)
+                        ? ($storedResponse['order'] ?? [])
+                        : [];
+
+                    if ($providerAmount === null) {
+                        $providerAmount = $storedOrder['amount'] ?? null;
+                    }
+
+                    if ($providerCurrency === null) {
+                        $providerCurrency = $storedOrder['currency'] ?? null;
+                    }
+                }
+
+                if (
+                    $providerAmount === null
+                    || number_format((float) $providerAmount, 2, '.', '') !== $localAmount
+                ) {
                     throw new Exception('Payment amount mismatch.');
                 }
 
                 $localCurrency = strtoupper((string) $payment['currency']);
-                $providerCurrency = strtoupper((string) ($result['currency'] ?? ''));
+                $providerCurrency = strtoupper((string) $providerCurrency);
 
                 if ($providerCurrency === '' || $providerCurrency !== $localCurrency) {
                     throw new Exception('Payment currency mismatch.');
