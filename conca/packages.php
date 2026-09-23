@@ -1,4 +1,4 @@
-<?php include("inc/config.php"); ?>
+<?php require_once("inc/config.php"); require_once("inc/admin_auth.php"); require_admin_permission($pdo, "package"); ?>
 
 <!DOCTYPE html>
 <html lang="az">
