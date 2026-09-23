@@ -34,7 +34,9 @@ class BirBankGateway implements PaymentGatewayInterface
 
             'authorized',
             'fully paid',
+            'fullypaid',
             'partially paid',
+            'partiallypaid',
             'funded',
             'closed' => 'paid',
 
