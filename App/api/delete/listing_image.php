@@ -1,47 +1,42 @@
 <?php
+declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . "/../../inc/config.php";
 
-$data = json_decode(file_get_contents("php://input"), true);
+require_login_api($pdo);
+csrf_verify($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null);
 
+$data = json_decode(file_get_contents("php://input"), true);
 $id = (int) ($data['id'] ?? 0);
 
-if (!$id) {
-    echo json_encode(["error" => "ID boşdur"]);
-    exit;
+if ($id <= 0) {
+    json_out(['ok' => false, 'error' => 'ID boşdur'], 422);
 }
 
-/* şəkli tap */
-
 $stmt = $pdo->prepare("
-   SELECT li.image_path
-FROM listing_images li
-JOIN listings l ON l.id = li.listing_id
-WHERE li.id=? AND l.customer_id=?
+    SELECT li.image_path
+    FROM listing_images li
+    JOIN listings l ON l.id = li.listing_id
+    WHERE li.id = ? AND l.customer_id = ?
+    LIMIT 1
 ");
-
-$stmt->execute([$id, $_SESSION['customer_id']]);
+$stmt->execute([$id, (int) $_SESSION['customer_id']]);
 
 $image = $stmt->fetchColumn();
 
 if (!$image) {
-    echo json_encode(["error" => "Şəkil tapılmadı"]);
-    exit;
+    json_out(['ok' => false, 'error' => 'Şəkil tapılmadı'], 404);
 }
 
-/* DB-dən sil */
-
-$stmt = $pdo->prepare("DELETE FROM listing_images WHERE id=?");
+$stmt = $pdo->prepare("DELETE FROM listing_images WHERE id = ?");
 $stmt->execute([$id]);
 
-/* faylı sil */
+$path = __DIR__ . "/../../assets/img/uploads/listings/" . basename((string) $image);
 
-$path = __DIR__ . "/../../uploads/listings/" . $image;
-
-if (file_exists($path)) {
-    unlink($path);
+if (is_file($path)) {
+    @unlink($path);
 }
 
-echo json_encode(["success" => true]);
+json_out(['ok' => true]);
