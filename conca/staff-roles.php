@@ -1,4 +1,4 @@
-<?php include("inc/config.php"); ?>
+<?php require_once("inc/config.php"); require_once("inc/admin_auth.php"); require_admin_permission($pdo, "staff"); $admin_csrf = admin_csrf_token(); ?>
 
 <!DOCTYPE html>
 <html lang="az">
@@ -216,7 +216,7 @@
 
                             if (result.isConfirmed) {
 
-                                window.location.href = deleteUrl;
+                                fetch(deleteUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"csrf="+encodeURIComponent("<?= admin_h($admin_csrf) ?>")+"&mid="+encodeURIComponent(new URL(deleteUrl,location.href).searchParams.get("mid"))}).then(()=>location.reload());
 
                             }
 

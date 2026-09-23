@@ -1,54 +1,18 @@
 <?php
-
+declare(strict_types=1);
 require_once("../../inc/config.php");
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    exit('Sorğu metodu yanlışdır.');
+require_once("../../inc/admin_auth.php");
+require_admin_permission($pdo,'staff');
+if($_SERVER['REQUEST_METHOD']!=='POST')exit('Sorğu metodu yanlışdır.');
+admin_verify_csrf($_POST['csrf']??null);
+$id=(int)($_POST['member_id']??0);$full=trim((string)($_POST['full_name']??''));$email=trim((string)($_POST['email']??''));$phone=trim((string)($_POST['phone']??''));$role=trim((string)($_POST['role']??''));
+if($id<=0||$full===''||!filter_var($email,FILTER_VALIDATE_EMAIL)||$phone===''||$role==='')exit('Məlumatları düzgün doldurun.');
+$st=$pdo->prepare("SELECT id,full_name,email,phone,role,status FROM tbl_user WHERE id=? LIMIT 1");$st->execute([$id]);$old=$st->fetch(PDO::FETCH_ASSOC);if(!$old)exit('Heyət üzvü tapılmadı.');
+if($id===(int)($_SESSION['user']['id']??0)&&$role!==$old['role'])exit('Öz rolunuzu dəyişə bilməzsiniz.');
+if(!$old['role']||!admin_is_super($pdo)){
+ if(in_array(strtolower($role),['super admin','superadmin','super_admin'],true)&&strtolower($old['role'])!=='super admin')exit('Super Admin rolu yalnız Super Admin tərəfindən verilə bilər.');
 }
-
-
-$member_id = $_POST['member_id'] ?? null;
-$full_name = trim($_POST['full_name'] ?? '');
-$email = trim($_POST['email'] ?? '');
-$phone = trim($_POST['phone'] ?? '');
-$role = trim($_POST['role'] ?? '');
-
-
-if (empty($full_name)) {
-    exit('Zəhmət olmasa, tam adı doldurun.');
-}
-if (empty($email)) {
-    exit('Zəhmət olmasa, emaili doldurun.');
-}
-if (empty($phone)) {
-    exit('Zəhmət olmasa, telefon nömrəsini doldurun.');
-}
-if (empty($role)) {
-    exit('Zəhmət olmasa, vəzifəni seçin.');
-}
-
-
-
-
-try {
-
-    // UPDATE
-    $statement = $pdo->prepare("
-        UPDATE tbl_user
-        SET full_name = ?, email = ?, phone = ?, role = ?
-        WHERE id = ?
-    ");
-
-    $statement->execute([$full_name, $email, $phone, $role, $member_id]);
-
-    echo 'success';
-
-} catch (PDOException $e) {
-
-    // Productionda bunu istifadəçiyə göstərmə
-    echo 'Server xətası baş verdi.';
-
-    // Debug üçün:
-    echo $e->getMessage();
-
-}
+$st=$pdo->prepare("SELECT id FROM tbl_user WHERE email=? AND id<>? LIMIT 1");$st->execute([$email,$id]);if($st->fetch())exit('Bu email artıq istifadə olunur.');
+$st=$pdo->prepare("UPDATE tbl_user SET full_name=?,email=?,phone=?,role=? WHERE id=?");$st->execute([$full,$email,$phone,$role,$id]);
+admin_audit($pdo,'staff.updated','staff',$id,$old,['full_name'=>$full,'email'=>$email,'phone'=>$phone,'role'=>$role]);
+echo 'success';

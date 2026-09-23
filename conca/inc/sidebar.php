@@ -169,7 +169,20 @@
                 </li>
 
 
-                <li class="app-sidebar-menu-heading">
+                <!-- EndOut management navigation -->
+<li class="app-sidebar-menu-heading">
+    <span><span class="app-sidebar-menu-heading-line"></span> ENDOUT İDARƏETMƏ</span>
+</li>
+<li class="app-sidebar-menu-item"><a href="index.php" class="menu-link d-flex align-items-center"><span class="menu-title flex-grow-1">Dashboard</span></a></li>
+<li class="app-sidebar-menu-item"><a href="customers.php" class="menu-link d-flex align-items-center"><span class="menu-title flex-grow-1">Müştərilər / Vendorlar</span></a></li>
+<li class="app-sidebar-menu-item"><a href="listings.php" class="menu-link d-flex align-items-center"><span class="menu-title flex-grow-1">Elan moderasiyası</span></a></li>
+<li class="app-sidebar-menu-item"><a href="tenders.php" class="menu-link d-flex align-items-center"><span class="menu-title flex-grow-1">Tender moderasiyası</span></a></li>
+<li class="app-sidebar-menu-item"><a href="complaints.php" class="menu-link d-flex align-items-center"><span class="menu-title flex-grow-1">Şikayətlər</span></a></li>
+<li class="app-sidebar-menu-item"><a href="payments.php" class="menu-link d-flex align-items-center"><span class="menu-title flex-grow-1">Ödənişlər</span></a></li>
+<li class="app-sidebar-menu-item"><a href="subscriptions.php" class="menu-link d-flex align-items-center"><span class="menu-title flex-grow-1">Abunəliklər</span></a></li>
+<li class="app-sidebar-menu-item"><a href="admin-reports.php" class="menu-link d-flex align-items-center"><span class="menu-title flex-grow-1">Hesabatlar</span></a></li>
+<li class="app-sidebar-menu-item"><a href="audit-logs.php" class="menu-link d-flex align-items-center"><span class="menu-title flex-grow-1">Audit Log</span></a></li>
+<li class="app-sidebar-menu-heading">
                     <span>
                         <span class="app-sidebar-menu-heading-line"></span>
                         SATIŞ

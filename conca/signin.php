@@ -1,86 +1,47 @@
 <?php
+declare(strict_types=1);
 require_once("inc/db.php");
 
 $statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=1");
 $statement->execute();
-$result = $statement->fetchAll(PDO::FETCH_ASSOC);
-foreach ($result as $row) {
-    $confirm_code = $row['confirm_code'];
-    $logo = $row['logo'];
-    $favicon = $row['favicon'];
-    $meta_title_home = $row['meta_title_home'];
-    $meta_keyword_home = $row['meta_keyword_home'];
-    $meta_description_home = $row['meta_description_home'];
-    $meta_img = $row['meta_img'];
-    $contact_email = $row['contact_email'];
-    $contact_phone = $row['contact_phone'];
-    $contact_address = $row['contact_address'];
-    $contact_map = $row['contact_map'];
-    $base_url = $row['base_url'];
-    $time_zone = $row['time_zone'];
-    $admin_url = $row['admin_url'];
-    $google_client_id = $row['google_client_id'];
-    $google_client_secret = $row['google_client_secret'];
-    $maintenance = $row['maintenance'];
-}
+$row = $statement->fetch(PDO::FETCH_ASSOC) ?: [];
 
-// Defining base url
-define("BASE_URL", $base_url);
-
-// Getting admin url
-define("ADMIN_URL", BASE_URL . "" . $admin_url . "/");
-
-//Confirm delete code
-define('CONFIRM_DELETE_KEY', $confirm_code);
-
-//Google Login
-define('GOOGLE_CLIENT_ID', $google_client_id);
-define('GOOGLE_CLIENT_SECRET', $google_client_secret);
-
-// Error Reporting Turn On
-ini_set('error_reporting', E_ALL);
-
-// Setting up the time zone
+$logo=$row['logo']??'';$meta_title_home=$row['meta_title_home']??'EndOut';$base_url=$row['base_url']??'';$time_zone=$row['time_zone']??'Asia/Baku';
+define("BASE_URL",$base_url);
+define("ADMIN_URL",BASE_URL.($row['admin_url']??'')."/");
 date_default_timezone_set($time_zone);
-
+ini_set('display_errors','0');ini_set('log_errors','1');
 
 include("inc/CSRF_Protect.php");
+$csrf=new CSRF_Protect();
+$error_message='';
 
-$csrf = new CSRF_Protect();
-$error_message = '';
-
-if (isset($_POST['login'])) {
-
-    // CSRF token doğrulaması
+if(isset($_POST['login'])){
     $csrf->verifyRequest();
+    $email=trim((string)($_POST['email']??''));
+    $password=(string)($_POST['pass']??'');
+    $ip=$_SERVER['REMOTE_ADDR']??null;
 
-    // Daxil edilən məlumatların təmizlənməsi
-    $email = trim($_POST['email']);
-    $password = $_POST['pass'];
-
-    // İstifadəçini email və aktiv status üzrə axtarırıq
-    $statement = $pdo->prepare("SELECT * FROM tbl_user WHERE email = ? AND status = ?");
-    $statement->execute([$email, 'Active']);
-    $row = $statement->fetch(PDO::FETCH_ASSOC);
-
-    if (!$row) {
-        $error_message .= 'Bu email bazada mövcud deyil<br>';
-    } else {
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error_message .= 'Email formatı yanlışdır<br>';
-        }
-        // DB-dən alınan hash-lanmış şifrə ilə daxil edilən şifrəni müqayisə edirik
-        if (!password_verify($password, $row['password'])) {
-            $error_message .= 'Şifrə uyğun gəlmir<br>';
-        } else {
-            // Daxil edilən məlumatlar düzgündür, sessiyaya məlumatı yazırıq və yönləndiririk
+    $rate=$pdo->prepare("SELECT COUNT(*) FROM admin_login_attempts WHERE success=0 AND created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) AND (email=? OR ip_address=?)");
+    $rate->execute([$email,$ip]);
+    if((int)$rate->fetchColumn()>=8){
+        $error_message='Çox sayda uğursuz giriş cəhdi. 15 dəqiqə sonra yenidən cəhd edin.';
+    }elseif(!filter_var($email,FILTER_VALIDATE_EMAIL)){
+        $error_message='Email və ya şifrə yanlışdır.';
+    }else{
+        $statement=$pdo->prepare("SELECT * FROM tbl_user WHERE email=? AND status='Active' LIMIT 1");
+        $statement->execute([$email]);$admin=$statement->fetch(PDO::FETCH_ASSOC);
+        if(!$admin || !password_verify($password,(string)$admin['password'])){
+            $pdo->prepare("INSERT INTO admin_login_attempts(email,ip_address,success) VALUES(?,?,0)")->execute([$email,$ip]);
+            $error_message='Email və ya şifrə yanlışdır.';
+        }else{
             session_regenerate_id(true);
-            $_SESSION['user'] = $row;
-            header("Location: index.php");
-            exit();
+            $_SESSION['user']=$admin;
+            $pdo->prepare("INSERT INTO admin_login_attempts(email,ip_address,success) VALUES(?,?,1)")->execute([$email,$ip]);
+            $pdo->prepare("INSERT INTO admin_sessions(admin_id,session_id,ip_address,user_agent) VALUES(?,?,?,?)")->execute([(int)$admin['id'],session_id(),$ip,substr((string)($_SERVER['HTTP_USER_AGENT']??''),0,255)]);
+            header("Location: index.php");exit;
         }
     }
-
 }
 ?>
 

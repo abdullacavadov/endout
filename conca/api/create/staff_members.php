@@ -1,101 +1,31 @@
 <?php
-
+declare(strict_types=1);
 require_once("../../inc/config.php");
+require_once("../../inc/admin_auth.php");
+require_admin_permission($pdo, 'staff');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') exit('Sorğu metodu yanlışdır.');
+admin_verify_csrf($_POST['csrf'] ?? null);
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    exit('Sorğu metodu yanlışdır.');
-}
+$full_name=trim((string)($_POST['full_name']??''));$email=trim((string)($_POST['email']??''));$phone=trim((string)($_POST['phone']??''));$role=trim((string)($_POST['role']??''));$password=(string)($_POST['password']??'');
+if($full_name===''||$email===''||$phone===''||$role===''||$password==='') exit('Bütün məcburi sahələri doldurun.');
+if(!filter_var($email,FILTER_VALIDATE_EMAIL)) exit('Email formatı yanlışdır.');
+if(strlen($password)<8) exit('Şifrə ən azı 8 simvol olmalıdır.');
+if(!admin_is_super($pdo) && in_array(strtolower($role),['super admin','superadmin','super_admin'],true)) exit('Super Admin rolu yalnız Super Admin tərəfindən verilə bilər.');
 
-
-$full_name = trim($_POST['full_name'] ?? '');
-$email = trim($_POST['email'] ?? '');
-$phone = trim($_POST['phone'] ?? '');
-$role = trim($_POST['role'] ?? '');
-$password = trim($_POST['password'] ?? '');
-
-
-if (empty($full_name)) {
-    exit('Zəhmət olmasa, tam adı qeyd edin.');
-}
-
-if (empty($email)) {
-    exit('Zəhmət olmasa, email ünvanını qeyd edin.');
-}
-
-if (empty($phone)) {
-    exit('Zəhmət olmasa, telefon nömrəsini qeyd edin.');
-}
-
-if (empty($role)) {
-    exit('Zəhmət olmasa, vəzifəni seçin.');
-}
-if (empty($password)) {
-    exit('Zəhmət olmasa, şifrəni qeyd edin.');
-}
-
-// Şifrəni hash-lə
-$password_hash = password_hash($password, PASSWORD_DEFAULT);
-
-
-
-
-try {
-    // Duplicate yoxlaması
-    $check = $pdo->prepare("SELECT email FROM tbl_user WHERE email = ?");
-    $check->execute([$email]);
-
-    if ($check->rowCount() > 0) {
-        exit('Bu email ünvanı artıq istifadə olunub.');
-    }
-
-    // Insert
-    $statement = $pdo->prepare("
-        INSERT INTO tbl_user (full_name, email, phone, role, password)
-        VALUES (?, ?, ?, ?, ?)
-    ");
-
-    $statement->execute([$full_name, $email, $phone, $role, $password_hash]);
-
-    //photo upload
-    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['photo']['tmp_name'];
-        $fileName = $_FILES['photo']['name'];
-        $fileSize = $_FILES['photo']['size'];
-        $fileType = $_FILES['photo']['type'];
-        $fileNameCmps = explode(".", $fileName);
-        $fileExtension = strtolower(end($fileNameCmps));
-
-        // İzin verilen dosya türleri
-        $allowedfileExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-
-        if (in_array($fileExtension, $allowedfileExtensions)) {
-            // Dosyayı kaydet
-            $uploadFileDir = '../../assets/img/avatar/';
-            $hashedFileName = 'avatar_' . $full_name . '.' . $fileExtension;
-            $dest_path = $uploadFileDir . $hashedFileName;
-
-            if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                // Dosya başarıyla yüklendi
-                $st = $pdo->prepare("UPDATE tbl_user SET photo = ? WHERE email = ?");
-                $st->execute([$hashedFileName, $email]);
-            } else {
-                exit('Fayl yüklənərkən xəta baş verdi.');
-            }
-        } else {
-            exit('Yalnız JPG, JPEG, PNG ve WEBP formatlarında fayllara icazə verilir.');
-        }
-    } else {
-        exit('Foto yüklənmədi və ya xəta baş verdi.');
-    }
-
-    echo 'success';
-
-} catch (PDOException $e) {
-
-    // Productionda bunu istifadəçiyə göstərmə
-    echo 'Server xətası baş verdi.';
-
-    // Debug üçün:
-    echo $e->getMessage();
-
-}
+try{
+ $check=$pdo->prepare("SELECT id FROM tbl_user WHERE email=? LIMIT 1");$check->execute([$email]);if($check->fetch())exit('Bu email artıq istifadə olunur.');
+ $check=$pdo->prepare("SELECT role_name FROM tbl_roles WHERE role_name=? AND role_is_active='Aktiv' LIMIT 1");$check->execute([$role]);if(!$check->fetch())exit('Aktiv rol seçilməyib.');
+ $hash=password_hash($password,PASSWORD_DEFAULT);
+ $st=$pdo->prepare("INSERT INTO tbl_user(full_name,email,phone,role,password,status) VALUES(?,?,?,?,?,'Active')");
+ $st->execute([$full_name,$email,$phone,$role,$hash]);$id=(int)$pdo->lastInsertId();
+ if(isset($_FILES['photo'])&&$_FILES['photo']['error']===UPLOAD_ERR_OK){
+   if($_FILES['photo']['size']>2*1024*1024)exit('Şəkil maksimum 2 MB ola bilər.');
+   $mime=(new finfo(FILEINFO_MIME_TYPE))->file($_FILES['photo']['tmp_name']);
+   $ext=['image/jpeg'=>'jpg','image/png'=>'png','image/gif'=>'gif'][$mime]??null;if(!$ext)exit('Yalnız JPG, PNG və GIF şəkillərinə icazə verilir.');
+   $name='avatar_'.bin2hex(random_bytes(8)).'.'.$ext;$dir=__DIR__.'/../../assets/img/avatar/';if(!is_dir($dir))mkdir($dir,0775,true);
+   if(!move_uploaded_file($_FILES['photo']['tmp_name'],$dir.$name))exit('Fayl yüklənmədi.');
+   $pdo->prepare("UPDATE tbl_user SET photo=? WHERE id=?")->execute([$name,$id]);
+ }
+ admin_audit($pdo,'staff.created','staff',$id,null,['full_name'=>$full_name,'email'=>$email,'role'=>$role]);
+ echo 'success';
+}catch(Throwable $e){error_log('staff create failed: '.$e->getMessage());echo 'Server xətası baş verdi.';}
