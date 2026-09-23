@@ -49,7 +49,7 @@ class BirBankGateway implements PaymentGatewayInterface
             'declined',
             'voided' => 'failed',
 
-            default => 'failed',
+            default => 'unknown',
         };
     }
 
@@ -134,6 +134,8 @@ class BirBankGateway implements PaymentGatewayInterface
             'provider_payment_id' => (string) $order['id'],
             'provider_reference' => $order['id'],
             'status' => $this->mapStatus($order['status']),
+            'amount' => $order['amount'] ?? null,
+            'currency' => $order['currency'] ?? null,
             'raw_response' => $response
         ];
     }
