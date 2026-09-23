@@ -155,7 +155,7 @@ require_once __DIR__ . "/api/data/subscription_data.php";
 									<div class="card-dropdown">
 										<ul>
 											<li class="nav-item dropdown has-arrow logged-item">
-												<a href="<?= $base_url; ?>/packages" class="car-list-btn" style="background-color: #c10037;
+												<a href="<?= $base_url; ?>/packages" class="car-list-btn" style="background-color: #2563EB;
 															color: #ffffff;
 															border-radius: 8px;
 															padding: 13px 32px;
@@ -409,7 +409,7 @@ require_once __DIR__ . "/api/data/subscription_data.php";
 						data: [used, remaining],
 						backgroundColor: !hasActiveSub || isExpired
 							? ["rgba(255,255,255,0)", "#999"]
-							: ["rgba(255,255,255,0)", "#990853"],
+							: ["rgba(255,255,255,0)", "#2563EB"],
 						borderWidth: 0,
 						borderRadius: 12,
 					},
