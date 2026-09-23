@@ -113,7 +113,7 @@ try {
 
     echo json_encode([
         'ok' => false,
-        'message' => $e instanceof Exception
+        'message' => APP_ENV === 'local'
             ? $e->getMessage()
             : 'Ödəniş başladılarkən xəta baş verdi.'
     ]);
