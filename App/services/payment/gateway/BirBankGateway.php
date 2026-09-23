@@ -88,8 +88,6 @@ class BirBankGateway implements PaymentGatewayInterface
             ]
         );
 
-        // var_dump($response);
-        // exit;
 
         if (!isset($response['order'])) {
             throw new Exception('Invalid BirBank response.');
