@@ -9,6 +9,8 @@ class BirBankGateway implements PaymentGatewayInterface
     private string $username;
     private string $password;
     private string $callbackUrl;
+    private string $lastRawResponse = '';
+    private int $lastHttpCode = 0;
 
     public function __construct(
         string $baseUrl,
@@ -47,6 +49,16 @@ class BirBankGateway implements PaymentGatewayInterface
 
             default => 'failed',
         };
+    }
+
+    public function getLastRawResponse(): string
+    {
+        return $this->lastRawResponse;
+    }
+
+    public function getLastHttpCode(): int
+    {
+        return $this->lastHttpCode;
     }
 
     public function refundPayment(array $payment): array
@@ -161,7 +173,9 @@ class BirBankGateway implements PaymentGatewayInterface
             throw new Exception(curl_error($ch));
         }
 
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $this->lastHttpCode = $httpCode;
+        $this->lastRawResponse = $response;
 
         curl_close($ch);
 
