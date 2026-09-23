@@ -1,6 +1,21 @@
-# Local payment configuration / secrets
-App/inc/payment_config.local.php
-
-# Environment files
+# Environment / secrets
 .env
 .env.*
+!.env.example
+
+# Local payment configuration
+App/inc/payment_config.local.php
+
+# Runtime / generated files
+App/rates.json
+App/storage/
+App/logs/
+*.log
+
+# User uploads
+App/assets/img/uploads/
+App/assets/video/uploads/
+
+# Composer dependencies
+App/vendor/
+conca/vendor/
